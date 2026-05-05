@@ -1,5 +1,8 @@
-package com.ajh.flow.domain.stock;
+package com.ajh.flow.common.constant;
 
+import lombok.Getter;
+
+@Getter
 public enum StockTransactionType {
     IN("입고"),
     OUT("출고"),
@@ -11,9 +14,5 @@ public enum StockTransactionType {
 
     StockTransactionType(String description) {
         this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }
