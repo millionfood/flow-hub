@@ -1,5 +1,6 @@
 package com.ajh.flow.domain;
 
+import com.ajh.flow.common.constant.UseYn;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,14 +26,15 @@ public class Warehouse extends BaseEntity{
     @Column(length = 255)
     private String address;
 
-    @Column(length = 20)
-    private String tel; //창고 연락처
-
     @Column(length = 100)
     private String managerName;
 
+    @Column(length = 20)
+    private String tel; //창고 연락처
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean useYn = true; // 사용 여부
+    private UseYn useYn = UseYn.Y; // 사용 여부
 
     @Builder
     public Warehouse(String name, String address, String tel, String managerName) {
