@@ -1,5 +1,6 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.domain.Warehouse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,8 @@ public class WarehouseRepository {
     }
 
     //-----------------수정-----------------
-
+    //변경 감지를 통한 수정
 
     //-----------------삭제-----------------
+    //변경 감지를 통한 수정(사용하지 않는 상태로 변경)
 }

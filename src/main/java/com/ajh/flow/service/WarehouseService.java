@@ -1,10 +1,12 @@
 package com.ajh.flow.service;
 
+import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InvalidAddressException;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.warehouse.WarehouseRegisterDto;
 import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
+import com.ajh.flow.dto.warehouse.WarehouseUpdateDto;
 import com.ajh.flow.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,8 +52,30 @@ public class WarehouseService {
     }
 
     //-----------------수정-------------------
+    @Transactional
+    public void updateWarehouse(Long id, WarehouseUpdateDto dto){
+        //창고 조회 (영속성 컨텍스트에 넣기)
+        Warehouse warehouse = findById(id);
+        //해당 엔티티 수정하고 트랜잭션 마무리
+        warehouse.update(dto);
+    }
 
-
-    //-----------------삭제-------------------
+    //-----------------useYn 상태 변경-------------------
+    //사용하지 않음
+    @Transactional
+    public void stopUseWarehouse(Long id){
+        //창고 조회 (영속성 컨텍스트에 넣기)
+        Warehouse warehouse = findById(id);
+        //해당 엔티티 수정하고 트랜잭션 마무리
+        warehouse.setUseYn(UseYn.N);
+    }
+    //재사용
+    @Transactional
+    public void reUseWarehouse(Long id){
+        //창고 조회 (영속성 컨텍스트에 넣기)
+        Warehouse warehouse = findById(id);
+        //해당 엔티티 수정하고 트랜잭션 마무리
+        warehouse.setUseYn(UseYn.Y);
+    }
 
 }

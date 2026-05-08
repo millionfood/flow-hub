@@ -28,8 +28,8 @@ public class ItemService {
 
     //상품 등록
     @Transactional
-    public Long registerItem(ItemRegisterDto form) {
-        Item item = form.toVO();
+    public Long registerItem(ItemRegisterDto dto) {
+        Item item = dto.toVO();
         // barcode를 위해 db에서 가장 마지막에 등록된 상품 코드를 조회
         String productCode = itemRepository.findLastProductCode();
         item.createFullBarcode(productCode);

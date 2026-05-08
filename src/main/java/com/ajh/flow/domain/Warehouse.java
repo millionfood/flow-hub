@@ -1,6 +1,7 @@
 package com.ajh.flow.domain;
 
 import com.ajh.flow.common.constant.UseYn;
+import com.ajh.flow.dto.warehouse.WarehouseUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,5 +43,12 @@ public class Warehouse extends BaseEntity{
         this.address = address;
         this.tel = tel;
         this.managerName = managerName;
+    }
+
+    public void update(WarehouseUpdateDto dto){
+        this.name = dto.getName();
+        this.address = dto.getAddress();
+        this.managerName = dto.getManagerName();
+        this.tel = dto.getTel();
     }
 }
