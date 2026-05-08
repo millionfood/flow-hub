@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/items")
 @Slf4j
 public class ItemController {
+
     private final ItemService itemService;
+
 
     //-----------------등록-----------------
     //상품 등록 페이지
@@ -50,7 +52,7 @@ public class ItemController {
     }
     //상품 상세 페이지
     @GetMapping("/detail/{itemId}")
-    public String detail(Model model,@PathVariable("itemId") Long itemId) {
+    public String detail(Model model,@PathVariable Long itemId) {
         Item item = itemService.findById(itemId);
         ItemDetailDto itemDetailDto = new ItemDetailDto(item);
         model.addAttribute("itemDetail", itemDetailDto);
@@ -58,28 +60,37 @@ public class ItemController {
         return "items/detail";
     }
 
+
     //-----------------수정-----------------
     //상품 정보 수정 페이지
     @GetMapping("/edit/{itemId}")
-    public String editForm(@PathVariable("itemId") Long ItemId, Model model) {
-        Item item = itemService.findById(ItemId);
+    public String editForm(@PathVariable Long itemId, Model model) {
+        Item item = itemService.findById(itemId);
         ItemUpdateDto updateDto = new ItemUpdateDto(item);
         model.addAttribute("itemForm", updateDto);
-        model.addAttribute("itemId", ItemId);
+        model.addAttribute("itemId", itemId);
         model.addAttribute("itemUnits", ItemUnit.values());
         return "items/edit";
     }
 
     //상품 정보 수정 처리
     @PostMapping("/edit/{itemId}")
-    public String edit(@PathVariable("itemId") Long itemId, @Valid @ModelAttribute("itemForm") ItemUpdateDto form, BindingResult result) {
+    public String edit(@PathVariable Long itemId, @Valid @ModelAttribute("itemForm") ItemUpdateDto form, BindingResult result) {
         if(result.hasErrors()) {
             log.info("에러가 발생했습니다.");
-            return "items/edit/";
+            return "items/edit";
         }
         log.info("상품 아이디입니다.: {}",itemId);
         itemService.updateItem(itemId,form);
 
         return "redirect:/items/list";
+    }
+
+
+    //-----------------삭제-----------------
+    @PostMapping("/delete/{itemId}")
+    public String delete(@PathVariable Long itemId) {
+        itemService.deleteItem(itemId);
+        return  "redirect:/items/list";
     }
 }

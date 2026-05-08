@@ -1,5 +1,6 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Stock;
 import jakarta.persistence.EntityManager;
@@ -18,10 +19,14 @@ public class ItemRepository {
 
     private final EntityManager em;
 
+    //-----------------저장-----------------
     //저장
     public void save(Item item) {
         em.persist(item);
     }
+
+
+    //-----------------조회-----------------
     //단건조회 - 아이디 기준
     public Optional<Item> findById(Long id) {
         return Optional.ofNullable(em.find(Item.class, id));
@@ -56,6 +61,19 @@ public class ItemRepository {
         return em.createQuery("select i from Item i", Item.class).getResultList();
     }
 
+
+    //-----------------수정-----------------
     //상품 정보 수정 - 변경감지를 이용해 처리(service계층에서)
+
+
+    //-----------------삭제-----------------
+    //상품 삭제
+    public void deleteById(Long id) {
+        Item item = em.find(Item.class, id);
+        if(item == null){
+            throw new EntityNotFoundException("삭제하려는 상품을 찾을 수 없습니다.");
+        }
+        em.remove(item);
+    }
 
 }

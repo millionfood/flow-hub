@@ -42,6 +42,12 @@
                     th:onclick="|location.href='@{/items/edit/{id}(id=${itemDetail.id})}'|" type="button">수정하기</button>
         </div>
         <div class="col">
+            <form th:action="@{/items/delete/{id}(id=${itemDetail.id})}" method="post"
+                  onsubmit="return confirm('이 상품을 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.');">
+                <button class="w-100 btn btn-danger btn-lg" type="submit">삭제하기</button>
+            </form>
+        </div>
+        <div class="col">
             <button class="w-100 btn btn-secondary btn-lg"
                     th:onclick="|location.href='@{/items/list}'|" type="button">목록으로</button>
         </div>

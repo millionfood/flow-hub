@@ -80,4 +80,10 @@ public class ItemService {
         //해당 엔티티 수정하고 트랜잭션 마무리
         item.update(dto);
     }
+
+    //-----------------삭제-------------------
+    @Transactional
+    public void deleteItem(Long id){
+        itemRepository.deleteById(id);
+    }
 }

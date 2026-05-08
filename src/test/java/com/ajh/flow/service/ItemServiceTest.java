@@ -94,4 +94,21 @@ class ItemServiceTest {
         assertThat(item2.getUnit()).isEqualTo(ItemUnit.BOX);
         assertThat(item2.getDescription()).isEqualTo("봄동사과");
     }
+
+    //itemService.deleteItem
+    //상품이 정상적으로 삭제되는지
+    @Test
+    @DisplayName("상품이 정상적으로 삭제되어야 합니다.")
+    public void deleteItem() throws Exception{
+        //Given - 아이템 엔티티 하나를 먼저 db에 집어넣고 flush,clear
+        Long itemId = itemService.registerItem(new ItemRegisterDto("사과",1000L,ItemUnit.EA,"두쫀쿠사과"));
+        em.flush();
+        em.clear();
+        //When - 엔티티를 삭제한 후 flush,clear
+        itemService.deleteItem(itemId);
+        em.flush();
+        em.clear();
+        //Then - 삭제 후 해당 엔티티 조회값이 null 이어야 함
+        assertThrows(EntityNotFoundException.class, () -> itemService.findById(itemId));
+    }
 }
