@@ -1,4 +1,4 @@
-package com.ajh.flow.dto;
+package com.ajh.flow.dto.item;
 
 import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.domain.Item;
@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ItemRegisterForm {
+public class ItemRegisterDto {
 
-    public ItemRegisterForm(Long price,String name, ItemUnit unit, String description) {
+    public ItemRegisterDto(String name, Long price, ItemUnit unit, String description) {
         this.price = price;
         this.name = name;
         this.unit = unit;

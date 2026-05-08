@@ -56,5 +56,6 @@ public class ItemRepository {
         return em.createQuery("select i from Item i", Item.class).getResultList();
     }
 
+    //상품 정보 수정 - 변경감지를 이용해 처리(service계층에서)
 
 }

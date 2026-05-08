@@ -2,12 +2,11 @@ package com.ajh.flow.service;
 
 import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.common.exception.EntityNotFoundException;
-import com.ajh.flow.common.exception.StockNotFoundException;
 import com.ajh.flow.domain.Item;
-import com.ajh.flow.dto.ItemRegisterForm;
+import com.ajh.flow.dto.item.ItemRegisterDto;
+import com.ajh.flow.dto.item.ItemUpdateDto;
 import com.ajh.flow.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ class ItemServiceTest {
     @DisplayName("상품 등록이 정상적으로 되었는지 확인")
     public void registerItem() throws Exception{
         //Given
-        ItemRegisterForm form = new ItemRegisterForm(1000L,"사과",ItemUnit.EA,"두쫀쿠사과");
+        ItemRegisterDto form = new ItemRegisterDto("사과",1000L,ItemUnit.EA,"두쫀쿠사과");
         //When
         Long savedItemId = itemService.registerItem(form);
         em.flush();
@@ -50,8 +49,8 @@ class ItemServiceTest {
     @DisplayName("바코드 번호는 순차적으로 부여 되어야 한다.")
     public void registerItemAndCheckBarcode() throws Exception{
         //Given
-        ItemRegisterForm form1 = new ItemRegisterForm(1000L,"사과",ItemUnit.EA,"두쫀쿠사과");
-        ItemRegisterForm form2 = new ItemRegisterForm(2000L,"배",ItemUnit.EA,"두쫀쿠배");
+        ItemRegisterDto form1 = new ItemRegisterDto("사과",1000L,ItemUnit.EA,"두쫀쿠사과");
+        ItemRegisterDto form2 = new ItemRegisterDto("배",2000L,ItemUnit.EA,"두쫀쿠배");
         //When
         itemService.registerItem(form1);
         em.flush();
@@ -75,5 +74,24 @@ class ItemServiceTest {
         assertThrows(EntityNotFoundException.class, () -> itemService.findByBarcode("0000"));
     }
 
-
+    //itemService.updateItem
+    //수정이 정상적으로 반영되었는지
+    @Test
+    @DisplayName("변경감지를 이용한 수정이 정삭적으로 완료되어야 한다.")
+    public void updateItem() throws Exception{
+        //Given - 아이템 엔티티 하나를 먼저 db에 집어넣고 flush,clear
+        Long itemId = itemService.registerItem(new ItemRegisterDto("사과",1000L,ItemUnit.EA,"두쫀쿠사과"));
+        em.flush();
+        em.clear();
+        //When - 다시 엔티티를 영속성컨텍스트에 넣은다음 값 수정후 flush,clear
+        Item item1 = itemService.findById(itemId);
+        item1.update(new ItemUpdateDto("사과",1200L,ItemUnit.BOX,"봄동사과"));
+        em.flush();
+        em.clear();
+        //Then
+        Item item2 = itemService.findById(itemId);
+        assertThat(item2.getPrice()).isEqualTo(1200L);
+        assertThat(item2.getUnit()).isEqualTo(ItemUnit.BOX);
+        assertThat(item2.getDescription()).isEqualTo("봄동사과");
+    }
 }

@@ -2,6 +2,7 @@ package com.ajh.flow.domain;
 
 import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.common.constant.UseYn;
+import com.ajh.flow.dto.item.ItemUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,6 +48,13 @@ public class Item extends BaseEntity {
         this.name = name;
         this.unit = unit;
         this.description = description;
+    }
+
+    public void update(ItemUpdateDto itemUpdateDto) {
+        this.name = itemUpdateDto.getName();
+        this.price = itemUpdateDto.getPrice();
+        this.unit = itemUpdateDto.getUnit();
+        this.description = itemUpdateDto.getDescription();
     }
 
     public void createFullBarcode(String productCode){

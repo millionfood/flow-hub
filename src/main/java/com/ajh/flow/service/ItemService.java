@@ -3,7 +3,9 @@ package com.ajh.flow.service;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InvalidBarcodeException;
 import com.ajh.flow.domain.Item;
-import com.ajh.flow.dto.ItemRegisterForm;
+import com.ajh.flow.dto.item.ItemDetailDto;
+import com.ajh.flow.dto.item.ItemRegisterDto;
+import com.ajh.flow.dto.item.ItemUpdateDto;
 import com.ajh.flow.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,7 +28,7 @@ public class ItemService {
 
     //상품 등록
     @Transactional
-    public Long registerItem(ItemRegisterForm form) {
+    public Long registerItem(ItemRegisterDto form) {
         Item item = form.toVO();
         // barcode를 위해 db에서 가장 마지막에 등록된 상품 코드를 조회
         String productCode = itemRepository.findLastProductCode();
@@ -49,9 +51,12 @@ public class ItemService {
         return item.getId();
     }
 
+    //-----------------조회-------------------
     //상품 전체 조회
-    public List<Item> findAll() {
-        return itemRepository.findAll();
+    public List<ItemDetailDto> findAll() {
+        return itemRepository.findAll().stream()
+                .map(ItemDetailDto::new)
+                .collect(Collectors.toList());
     }
 
     //상품 단건 조회 - 아이디
@@ -64,5 +69,15 @@ public class ItemService {
     public Item findByBarcode(String barcode) {
         return  itemRepository.findByBarcode(barcode)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+
+    //-----------------수정-------------------
+    @Transactional
+    public void updateItem(Long id, ItemUpdateDto dto){
+        //아이템 조회 (영속성 컨텍스트에 넣기)
+        Item item = itemRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        //해당 엔티티 수정하고 트랜잭션 마무리
+        item.update(dto);
     }
 }
