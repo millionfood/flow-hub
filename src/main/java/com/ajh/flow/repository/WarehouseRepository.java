@@ -38,9 +38,7 @@ public class WarehouseRepository {
         return em.createQuery("select w from Warehouse w", Warehouse.class).getResultList();
     }
 
-    //-----------------수정-----------------
+    //-----------------상태변경-----------------
     //변경 감지를 통한 수정
 
-    //-----------------삭제-----------------
-    //변경 감지를 통한 수정(사용하지 않는 상태로 변경)
 }
