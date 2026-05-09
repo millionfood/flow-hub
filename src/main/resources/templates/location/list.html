@@ -38,9 +38,7 @@
         <!-- 데이터 반복 출력 -->
         <tr th:each="loc : ${locationList}">
             <td th:text="${loc.id}">1</td>
-            <td>
-                <a th:href="@{/location/detail/{id}(id=${loc.id})}"><span class="badge bg-info text-dark" th:text="${loc.warehouseName}">부산창고</span></a>
-            </td>
+            <td><span class="badge bg-info text-dark" th:text="${loc.warehouseName}">부산창고</span></td>
             <td th:text="${loc.zone}">ZONE_A</td>
             <td th:text="${loc.locCode}">A-1-1</td>
             <td>
@@ -48,7 +46,7 @@
                 <span th:if="${loc.useYn.name() == 'N'}" class="text-danger">미사용</span>
             </td>
             <td>
-                <a th:href="@{/location/edit/{id}(id=${loc.id})}" class="btn btn-sm btn-outline-secondary">수정</a>
+                <a th:href="@{/location/detail/{id}(id=${loc.id})}" class="btn btn-sm btn-outline-secondary">상태변경</a>
             </td>
         </tr>
         </tbody>

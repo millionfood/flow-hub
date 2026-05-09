@@ -6,6 +6,7 @@ import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationRegisterDto;
+import com.ajh.flow.dto.location.LocationUpdateDto;
 import com.ajh.flow.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,8 +52,26 @@ public class LocationService {
     }
 
     //-----------------수정-------------------
-
+    @Transactional
+    public void updateLocation(Long id, LocationUpdateDto dto){
+        //dto에는 warehouse가 없기에 따로 불러와서 넣어주어야 한다.
+        Warehouse warehouse = warehouseService.findById(dto.getWarehouseId());
+        //해당 엔티티 수정하고 트랜잭션 마무리
+        Location location = locationRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        location.update(dto,warehouse);
+    }
 
     //-----------------상태변경-------------------
+    @Transactional
+    public void stopUseLocation(Long id){
+        Location location = findById(id);
+        location.stopUse();
+    }
+    @Transactional
+    public void reUseLocation(Long id){
+        Location location = findById(id);
+        location.reUse();
+    }
 
 }

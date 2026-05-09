@@ -54,12 +54,7 @@
 
             <!-- 1. 목록으로 (마진을 주어 버튼 사이 간격 조절) -->
             <div class="me-2">
-                <a th:href="@{/locations}" class="btn btn-secondary btn-lg">목록으로</a>
-            </div>
-
-            <!-- 2. 정보 수정 -->
-            <div class="me-2">
-                <a th:href="@{/locations/{id}/edit(id=*{id})}" class="btn btn-warning btn-lg">정보 수정</a>
+                <a th:href="@{/location/list}" class="btn btn-secondary btn-lg">목록으로</a>
             </div>
 
             <!-- 3. 사용 중지 (조건부 노출) -->

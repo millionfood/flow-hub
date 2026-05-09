@@ -5,6 +5,7 @@ import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationRegisterDto;
+import com.ajh.flow.dto.location.LocationUpdateDto;
 import com.ajh.flow.service.LocationService;
 import com.ajh.flow.service.WarehouseService;
 import jakarta.validation.Valid;
@@ -66,8 +67,18 @@ public class LocationController {
 
 
     //-----------------수정-----------------
-
+    //정보 수정은 없음 - 재고가 있는 상태에서 수정할수 없기때문
+    //기존의 로케이션을 미사용으로두고, 새로운 로케이션을 추가해서 재고를 이동하는 방식으로 사용
 
     //-----------------상태 변경-----------------
-
+    @PostMapping("/stopUse/{id}")
+    public String stopUse(@PathVariable Long id){
+        locationService.stopUseLocation(id);
+        return "redirect:/location/detail/"+id;
+    }
+    @PostMapping("/reUse/{id}")
+    public String reUse(@PathVariable Long id){
+        locationService.reUseLocation(id);
+        return "redirect:/location/detail/"+id;
+    }
 }

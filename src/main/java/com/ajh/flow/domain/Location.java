@@ -2,6 +2,7 @@ package com.ajh.flow.domain;
 
 import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.UseYn;
+import com.ajh.flow.dto.location.LocationUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,6 +57,26 @@ public class Location extends BaseEntity {
 
     public void insertWarehouse(Warehouse warehouse) {
         this.warehouse = warehouse;
+    }
+
+    public void update(LocationUpdateDto dto, Warehouse warehouse) {
+        this.warehouse = warehouse;
+        this.zone = dto.getZone();
+        this.row = dto.getRow();
+        this.col = dto.getCol();
+        this.level = dto.getLevel();
+        this.locCode = String.format("%s-%02d-%02d-%02d",
+                zone.getPrefix(),
+                Integer.parseInt(row),
+                Integer.parseInt(col),
+                Integer.parseInt(level));
+    }
+
+    public void stopUse(){
+        this.useYn = UseYn.N;
+    }
+    public void reUse(){
+        this.useYn = UseYn.Y;
     }
 
 }
