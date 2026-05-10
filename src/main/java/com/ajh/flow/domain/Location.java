@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "locations")
+@Table(name = "locations", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_warehouse_zone__loc_code",
+                columnNames = {"warehouse_id","zone","loc_code"}
+        )
+})
 @Getter
 @NoArgsConstructor
 public class Location extends BaseEntity {
@@ -34,11 +39,11 @@ public class Location extends BaseEntity {
     @Column(nullable = false)
     private UseYn useYn =  UseYn.Y;
 
-    @Column(name = "loc_row",nullable = false,length = 20,unique = true)
+    @Column(name = "loc_row",nullable = false,length = 20)
     private String row; //행
-    @Column(name = "loc_col",nullable = false,length = 20,unique = true)
+    @Column(name = "loc_col",nullable = false,length = 20)
     private String col; //열
-    @Column(name = "loc_level",nullable = false,length = 20,unique = true)
+    @Column(name = "loc_level",nullable = false,length = 20)
     private String level; //단
 
     @Builder
