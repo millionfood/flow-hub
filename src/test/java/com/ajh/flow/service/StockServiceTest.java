@@ -2,6 +2,7 @@ package com.ajh.flow.service;
 
 import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.common.constant.LocationZone;
+import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.Stock;
@@ -56,7 +57,7 @@ class StockServiceTest {
     @DisplayName("최초 입고시 Stock Entity 생성")
     public void addNewStock() throws Exception{
         //Given - 상품 등록
-        Long stockId = stockService.registerStock(new StockRegisterDto(itemId, locationId, 1000L));
+        Long stockId = stockService.registerStock(new StockRegisterDto(itemId, locationId, 1000L, StockStatus.AVAILABLE));
         //When
         em.flush();
         em.clear();
