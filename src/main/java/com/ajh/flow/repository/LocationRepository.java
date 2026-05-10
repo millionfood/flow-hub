@@ -1,5 +1,7 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.constant.LocationZone;
+import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,10 @@ public class LocationRepository {
     public Optional<Location> findById(Long id) {
         return Optional.ofNullable(em.find(Location.class,id));
     }
-    public boolean existsByLocCode(String locCode) {
-        Long count = em.createQuery("select count(l) from Location l where l.locCode =:locCode", Long.class)
+    public boolean existsByLocCode(Long warehouseId, LocationZone zone, String locCode) {
+        Long count = em.createQuery("select count(l) from Location l where l.warehouse.id =: warehouseId and l.zone =: zone and l.locCode =:locCode", Long.class)
+                .setParameter("warehouseId", warehouseId)
+                .setParameter("zone", zone)
                 .setParameter("locCode",locCode)
                 .getSingleResult();
         return count > 0;
@@ -38,4 +42,6 @@ public class LocationRepository {
     //-----------------수정/상태변경-----------------
     //변경 감지를 이용
 
+
+    //-----------------기타-----------------
 }

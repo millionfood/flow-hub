@@ -41,17 +41,36 @@ class LocationServiceTest {
     }
 
     @Test
-    @DisplayName("locCode가 중복되면 에러가 발생해야 한다.")
+    @DisplayName("warehouse+zone+locCode가 중복되면 안된다.")
     public void duplicateLocCode() throws Exception{
         //Given warehouse 등록 후, location등록
         warehouseService.registerWarehouse(new WarehouseRegisterDto("부산창고","부산광역시 금정구","안진혁","01038041915"));
         locationService.registerLocation(new LocationRegisterDto(1L, LocationZone.COLD,"01","01","01"));
         em.flush();
         em.clear();
-        //When - 동일한 locCode의 dto 생성
+        //When 동일한 warehouse+zone+locCode
         LocationRegisterDto dto = new LocationRegisterDto(1L, LocationZone.COLD,"01","01","01");
         //Then
         assertThrows(InvalidLocationException.class,()->locationService.registerLocation(dto));
+    }
+
+    @Test
+    @DisplayName("다른 창고의 zone+locCode 는 통과되어야 한다.")
+    public void diffWarehouseAndDuplicateLocCode() throws Exception{
+        //Given warehouse 등록 후, location등록
+        warehouseService.registerWarehouse(new WarehouseRegisterDto("부산창고","부산광역시 금정구","안진혁","01038041915"));
+        warehouseService.registerWarehouse(new WarehouseRegisterDto("서울창고","서울특별시 송파구","안태웅","01000001234"));
+        locationService.registerLocation(new LocationRegisterDto(1L, LocationZone.COLD,"01","01","01"));
+        em.flush();
+        em.clear();
+        //When
+        // 같은창고의 다른 zone + 같은 locCode
+        LocationRegisterDto dto1 = new LocationRegisterDto(1L, LocationZone.FRIDGE,"01","01","01");
+        // 다른창고의 동일한 zone+locCode
+        LocationRegisterDto dto2 = new LocationRegisterDto(2L, LocationZone.COLD,"01","01","01");
+        //Then
+        assertDoesNotThrow(()->locationService.registerLocation(dto1));
+        assertDoesNotThrow(()->locationService.registerLocation(dto2));
     }
 
     @Test

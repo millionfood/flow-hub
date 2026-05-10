@@ -2,6 +2,7 @@ package com.ajh.flow.service;
 
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InvalidLocationException;
+import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.location.LocationDetailDto;
@@ -26,12 +27,13 @@ public class LocationService {
     //-----------------등록-------------------
     @Transactional
     public Long registerLocation(LocationRegisterDto dto){
+        //locCode는 entity로 변환되면서 builder에 의해서 생성됨
         Location location = dto.toVo();
         //db에 중복도니 locCode가 있는지 확인
-        if(locationRepository.existsByLocCode(location.getLocCode())) {
-            throw new InvalidLocationException("해당 locCode는 이미 존재합니다.");
+        if(locationRepository.existsByLocCode(dto.getWarehouseId(),dto.getZone(),location.getLocCode())) {
+            throw new InvalidLocationException("해당 창고의 locCode는 이미 존재합니다.");
         }
-        //dto에 들어 있는 warehouseId값으로 db에서 해당 객체 들고오기
+        //warehouse 들고오기 - location 엔티티에 넣어줘야함(dto에는 없음)
         Warehouse warehouse = warehouseService.findById(dto.getWarehouseId());
         location.insertWarehouse(warehouse);
 
@@ -74,4 +76,6 @@ public class LocationService {
         location.reUse();
     }
 
+
+    //-----------------기타-------------------
 }
