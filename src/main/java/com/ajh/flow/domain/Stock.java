@@ -1,5 +1,7 @@
 package com.ajh.flow.domain;
 
+import com.ajh.flow.common.constant.StockStatus;
+import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.InsufficientStockException;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -36,11 +38,20 @@ public class Stock extends BaseEntity{
     @Column(nullable = false)
     private Long quantity = 0L;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StockStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UseYn useYn = UseYn.Y;
+
     @Builder
-    public Stock( Location location, Item item, Long quantity) {
+    public Stock( Location location, Item item, Long quantity, StockStatus status) {
         this.location = location;
         this.item = item;
         this.quantity = quantity;
+        this.status = status;
     }
 
     //-----비즈니스 로직-----
