@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,6 +80,22 @@ public class ItemService {
                 .orElseThrow(EntityNotFoundException::new);
         //해당 엔티티 수정하고 트랜잭션 마무리
         item.update(dto);
+    }
+
+
+    //-----------------상태변경-------------------
+    @Transactional
+    public void stopUseItem(Long id){
+        Item item = itemRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        item.stopUse();
+    }
+
+    @Transactional
+    public void reUseItem(Long id){
+        Item item = itemRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        item.reUse();
     }
 
     //-----------------삭제-------------------

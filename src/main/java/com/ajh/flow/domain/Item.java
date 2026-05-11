@@ -56,7 +56,12 @@ public class Item extends BaseEntity {
         this.unit = itemUpdateDto.getUnit();
         this.description = itemUpdateDto.getDescription();
     }
-
+    public void stopUse(){
+        this.useYn = UseYn.N;
+    }
+    public void reUse(){
+        this.useYn = UseYn.Y;
+    }
     public void createFullBarcode(String productCode){
         int nextCode = Integer.parseInt(productCode) + 1;
         String formattedCode = String.format("%05d", nextCode);
