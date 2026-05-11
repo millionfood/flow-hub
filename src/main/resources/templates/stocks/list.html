@@ -23,7 +23,7 @@
             <th>No.</th>
             <th>창고명</th>
             <th>로케이션 코드</th>
-            <th>상품명 [코드]</th>
+            <th>상품명</th>
             <th>현재 수량</th>
             <th>상태</th>
             <th>최종 수정일</th>
@@ -43,7 +43,6 @@
             <td th:text="${stock.locationLocCode}">LOC-A-01</td>
             <td>
                 <span th:text="${stock.itemName}">상품명</span>
-                <small class="text-muted" th:text="'[' + ${stock.itemName} + ']'"></small>
             </td>
             <td th:text="${#numbers.formatInteger(stock.quantity, 0, 'COMMA')}">1,000</td>
             <td>
@@ -57,8 +56,8 @@
             </td>
             <td th:text="${#temporals.format(stock.lastModifiedDate, 'yyyy-MM-dd HH:mm')}">2026-05-10 14:00</td>
             <td>
-                <a th:href="@{/stocks/move(id=${stock.id})}" class="btn btn-sm btn-info">이동</a>
-                <a th:href="@{/stocks/edit(id=${stock.id})}" class="btn btn-sm btn-primary">수정</a>
+                <a th:href="@{/stocks/move/{id}(id=${stock.id})}" class="btn btn-sm btn-info">이동</a>
+                <a th:href="@{/stocks/edit/{id}(id=${stock.id})}" class="btn btn-sm btn-primary">수정</a>
             </td>
         </tr>
         </tbody>

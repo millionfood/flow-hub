@@ -19,6 +19,12 @@ public class StockRegisterDto {
         this.quantity = quantity;
         this.status = status;
     }
+    public StockRegisterDto(StockMoveDto dto){
+        this.itemId = dto.getItemId();
+        this.locationId = dto.getToLocationId();
+        this.quantity = dto.getMoveQuantity();
+        this.status = dto.getStatus();
+    }
 
     @NotNull(message = "상품은 필수 선택입니다.")
     private Long itemId;

@@ -1,19 +1,25 @@
 package com.ajh.flow.controller;
 
 import com.ajh.flow.common.constant.StockStatus;
+import com.ajh.flow.domain.Stock;
+import com.ajh.flow.dto.stock.StockDetailDto;
+import com.ajh.flow.dto.stock.StockMoveDto;
 import com.ajh.flow.dto.stock.StockRegisterDto;
+import com.ajh.flow.dto.stock.StockUpdateDto;
 import com.ajh.flow.service.ItemService;
 import com.ajh.flow.service.LocationService;
 import com.ajh.flow.service.StockService;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Controller
 @RequestMapping("/stocks")
 @RequiredArgsConstructor
@@ -52,6 +58,52 @@ public class StockController {
     }
 
     //-----------------상태변경-----------------
+    //단순 수정
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable Long id, Model model) {
+        StockUpdateDto dto = new StockUpdateDto(stockService.findById(id));
+        model.addAttribute("stockId",id);
+        model.addAttribute("stockUpdateDto", dto);
+        model.addAttribute("stockDetailDto",stockService.findDetailDtoById(id));
+        model.addAttribute("statusList", StockStatus.values());
+
+        return "stocks/edit";
+    }
+    @PostMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, @ModelAttribute("stockUpdateDto") StockUpdateDto dto) {
+        stockService.updateStock(id, dto);
+        return "redirect:/stocks/list";
+    }
+    //재고 이동
+    @GetMapping("/move/{id}")
+    public String moveForm(@PathVariable Long id, Model model) {
+        StockDetailDto dto = stockService.findDetailDtoById(id);
+        model.addAttribute("stockId",id);
+        model.addAttribute("stockMoveDto", new StockMoveDto(dto));
+        model.addAttribute("stockDetailDto",dto);
+        model.addAttribute("moveableLocations",locationService.findMoveableLocations(dto.getItemId(),dto.getLocationId()));
+        return "stocks/move";
+    }
+    @PostMapping("/move/{id}")
+    public String move(@PathVariable Long id, @Valid @ModelAttribute("stockMoveDto") StockMoveDto dto, BindingResult result, Model model) {
+        StockDetailDto detailDto = stockService.findDetailDtoById(id);
+        if (result.hasErrors()) {
+            log.error("Stock Move Error : {}",result.getAllErrors());
+            model.addAttribute("stockId",id);
+            model.addAttribute("stockMoveDto", dto);
+            model.addAttribute("stockDetailDto",detailDto);
+            model.addAttribute("moveableLocations",locationService.findMoveableLocations(detailDto.getItemId(),detailDto.getLocationId()));
+            return "stocks/move";
+        }
+        stockService.moveStock(id,dto);
+        return "redirect:/stocks/list";
+    }
+    //-----------------삭제-----------------
+    @PostMapping("delete/{id}")
+    public String delete(@PathVariable Long id, Model model) {
+        stockService.deleteStock(id);
+        return "redirect:/stocks/list";
+    }
 
 
 }

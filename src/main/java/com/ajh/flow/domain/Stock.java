@@ -3,6 +3,7 @@ package com.ajh.flow.domain;
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.InsufficientStockException;
+import com.ajh.flow.dto.stock.StockUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import lombok.Setter;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_location_item",
-                        columnNames = {"location_id","item_id"}
+                        columnNames = {"status","location_id","item_id"}
                 )
         }
 )
@@ -52,6 +53,11 @@ public class Stock extends BaseEntity{
         this.item = item;
         this.quantity = quantity;
         this.status = status;
+    }
+
+    public void update(StockUpdateDto dto){
+        this.quantity = dto.getQuantity();
+        this.status = dto.getStatus();
     }
 
     //-----비즈니스 로직-----
