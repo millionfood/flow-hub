@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public String handleException(Exception e, HttpServletRequest request, RedirectAttributes rttr) {
-        log.error("<UNK> <UNK> <UNK>: {}",e.getMessage());
+        log.error("예상하지 못한 오류: {}",e.getMessage());
 
         rttr.addFlashAttribute("error", e.getMessage());
         return "redirect:/";
