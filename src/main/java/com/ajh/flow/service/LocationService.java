@@ -8,6 +8,7 @@ import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationRegisterDto;
 import com.ajh.flow.dto.location.LocationUpdateDto;
+import com.ajh.flow.repository.ItemRepository;
 import com.ajh.flow.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 public class LocationService {
 
     private final LocationRepository locationRepository;
+    private final ItemRepository itemRepository;
+
     private final WarehouseService warehouseService;
 
     //-----------------등록-------------------
@@ -48,9 +51,21 @@ public class LocationService {
                 .map(LocationDetailDto::new)
                 .collect(Collectors.toList());
     }
+//    public List<LocationDetailDto> findInboundableLocations(){
+//
+//    }
     public Location findById(Long id){
         return locationRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
+    }
+    public List<LocationDetailDto> findMoveableLocations(Long itemId, Long locationId){
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(EntityNotFoundException::new);
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(EntityNotFoundException::new);
+        return locationRepository.findMoveableLocations(item,location)
+                .stream().map(LocationDetailDto::new)
+                .collect(Collectors.toList());
     }
 
     //-----------------수정-------------------
