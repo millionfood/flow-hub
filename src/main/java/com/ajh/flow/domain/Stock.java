@@ -20,7 +20,7 @@ import lombok.Setter;
                 )
         }
 )
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class Stock extends BaseEntity{
 
