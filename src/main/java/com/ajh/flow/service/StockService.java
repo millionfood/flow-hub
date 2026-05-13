@@ -5,16 +5,13 @@ import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InsufficientStockException;
 import com.ajh.flow.common.exception.InvalidStockException;
-import com.ajh.flow.domain.History;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.Stock;
-import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.stock.StockDetailDto;
 import com.ajh.flow.dto.stock.StockMoveDto;
 import com.ajh.flow.dto.stock.StockRegisterDto;
 import com.ajh.flow.dto.stock.StockUpdateDto;
-import com.ajh.flow.repository.HistoryRepository;
 import com.ajh.flow.repository.ItemRepository;
 import com.ajh.flow.repository.LocationRepository;
 import com.ajh.flow.repository.StockRepository;
@@ -25,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,38 +30,42 @@ import java.util.stream.Collectors;
 public class StockService {
 
     private final StockRepository stockRepository;
+    private final LocationRepository locationRepository;
+    private final ItemRepository itemRepository;
 
-    private final ItemService itemService;
-    private final LocationService locationService;
 
 
     //-----------------등록-------------------
     //재고 입고
     @Transactional
     public Long registerStock(StockRegisterDto dto){
-
-        Location location = locationService.findById(dto.getLocationId());
-        Item item = itemService.findById(dto.getItemId());
+        Location location = locationRepository.findById(dto.getLocationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Item item = itemRepository.findById(dto.getItemId())
+                .orElseThrow(EntityNotFoundException::new);
 
         //로케이션과 상품이 현재 사용 가능한 상태인지 확인
         existLocationAndItem(location, item);
 
-        //로케이션에 동일한 아이템이 있는지 확인
-        if(stockRepository.existsByLocationAndItem(location.getId(),item.getId(),dto.getStatus())){
-            throw new InvalidStockException("이미 동일한 위치에 동일한 상태의 상품이 존재합니다. - 재고 수정을 이용해 주세요.");
-        }
+        //로케이션에 동일한 상태의 아이템이 있는지 확인
+        return stockRepository.find_Same_Location_Item_Status(location.getId(),item.getId(),dto.getStatus())
+                .map(stock ->{
+                    stock.addQuantity(dto.getQuantity());
+                    return stock.getId();
+                })
+                .orElseGet(()->{
+                    Stock stock = Stock.builder()
+                            .item(item)
+                            .location(location)
+                            .quantity(dto.getQuantity())
+                            .status(dto.getStatus())
+                            .build();
 
-        //상품 생성
-        Stock stock = Stock.builder()
-                .item(item)
-                .location(location)
-                .quantity(dto.getQuantity())
-                .status(dto.getStatus())
-                .build();
+                    stockRepository.save(stock);
+                    //재고 이력 남기기
+                    return stock.getId();
+                });
 
-        stockRepository.save(stock);
-        //재고 이력 남기기
-        return stock.getId();
     }
 
 
@@ -100,8 +99,10 @@ public class StockService {
     public Long moveStock(Long id, StockMoveDto dto){
         Long returnValue;
         Stock oldStock = findById(id);
-        Location toLocation = locationService.findById(dto.getToLocationId());
-        Item item = itemService.findById(dto.getItemId());
+        Location toLocation = locationRepository.findById(dto.getToLocationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Item item = itemRepository.findById(dto.getItemId())
+                .orElseThrow(EntityNotFoundException::new);
         //1.이동 수량이 기존의 재고보다 적은가
         if(oldStock.getQuantity() < dto.getMoveQuantity()){
             throw new InsufficientStockException("이동하려는 수량이 기존의 수량을 초과합니다.");

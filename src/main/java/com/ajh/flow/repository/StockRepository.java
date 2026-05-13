@@ -90,16 +90,16 @@ public class StockRepository {
     }
 
     //특정 로케이션에 속한 아이템 목록
-    public boolean existsByLocationAndItem(Long locationId, Long itemId, StockStatus status) {
-        Long count = em.createQuery("select count(s) from Stock s "+
+    public Optional<Stock> find_Same_Location_Item_Status(Long locationId, Long itemId, StockStatus status) {
+        return em.createQuery("select s from Stock s "+
                 "where s.location.id =: locationId "+
                 "and s.item.id =: itemId "+
-                "and s.status =: status", Long.class)
+                "and s.status =: status", Stock.class)
                 .setParameter("locationId",locationId)
                 .setParameter("itemId",itemId)
                 .setParameter("status",status)
-                .getSingleResult();
+                .getResultList().stream().findFirst();
 
-        return count > 0;
+
     }
 }

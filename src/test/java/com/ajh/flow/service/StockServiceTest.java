@@ -79,6 +79,22 @@ class StockServiceTest {
         assertThat(stockService.findById(stockId).getQuantity()).isEqualTo(1000L);
 
     }
+    @Test
+    @DisplayName("같은 상태의 아이템 입고시 재고 추가,다른 상태의 아이템 입고시 신규입고")
+    public void addNewStock2() throws Exception{
+        //Given - 상품 등록
+        Long oldStatusStockId = stockService.registerStock(new StockRegisterDto(itemId, locationId, 1000L, StockStatus.AVAILABLE));
+        Long sameStatusStockId = stockService.registerStock(new StockRegisterDto(itemId, locationId, 1000L, StockStatus.AVAILABLE));
+        Long diffStatusStockId = stockService.registerStock(new StockRegisterDto(itemId, locationId, 1000L, StockStatus.DAMAGED));
+        //When
+        em.flush();
+        em.clear();
+        //Then
+        assertThat(oldStatusStockId).isEqualTo(sameStatusStockId);
+        assertThat(stockService.findById(oldStatusStockId).getQuantity()).isEqualTo(2000L);
+        assertThat(stockService.findById(diffStatusStockId).getQuantity()).isEqualTo(1000L);
+
+    }
 
     @Test
     @DisplayName("stock 업데이트가 정상적으로 이루어져야 한다.")
