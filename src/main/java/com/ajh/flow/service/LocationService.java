@@ -51,9 +51,12 @@ public class LocationService {
                 .map(LocationDetailDto::new)
                 .collect(Collectors.toList());
     }
-//    public List<LocationDetailDto> findInboundableLocations(){
-//
-//    }
+    public List<LocationDetailDto> findInboundAbleALlLocation(Item item){
+        return locationRepository.findInboundAbleALlLocation(item)
+                .stream()
+                .map(LocationDetailDto::new)
+                .collect(Collectors.toList());
+    }
     public Location findById(Long id){
         return locationRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);

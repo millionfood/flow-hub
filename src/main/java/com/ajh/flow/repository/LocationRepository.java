@@ -30,6 +30,15 @@ public class LocationRepository {
     public List<Location> findAll(){
         return em.createQuery("select l from Location l",Location.class).getResultList();
     }
+    public List<Location> findInboundAbleALlLocation(Item item){
+        String jpql = "select l from Location l "+
+                "where l not in ("+
+                "select s.location from Stock s "+
+                "where s.item != : item)";
+        return em.createQuery(jpql,Location.class)
+                .setParameter("item",item)
+                .getResultList();
+    }
     //단건 조회 - 아이디 기준
     public Optional<Location> findById(Long id) {
         return Optional.ofNullable(em.find(Location.class,id));

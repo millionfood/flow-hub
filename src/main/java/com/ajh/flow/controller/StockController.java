@@ -1,7 +1,9 @@
 package com.ajh.flow.controller;
 
 import com.ajh.flow.common.constant.StockStatus;
+import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Stock;
+import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.stock.StockDetailDto;
 import com.ajh.flow.dto.stock.StockMoveDto;
 import com.ajh.flow.dto.stock.StockRegisterDto;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -104,6 +108,15 @@ public class StockController {
         stockService.deleteStock(id);
         return "redirect:/stocks/list";
     }
+
+    //-----------------삭제-----------------
+    @ResponseBody
+    @GetMapping("/api/locations")
+    public List<LocationDetailDto> getInboundAbleLocations(@RequestParam("itemId") Long itemId) {
+       Item item = itemService.findById(itemId);
+       return locationService.findInboundAbleALlLocation(item);
+    }
+
 
 
 }

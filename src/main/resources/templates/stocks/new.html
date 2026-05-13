@@ -10,24 +10,12 @@
   <h2>신규 재고 등록</h2>
 
   <form th:action="@{/stocks/new}" th:object="${stock}" method="post">
-    <!-- 로케이션 선택 -->
-    <div>
-      <label>로케이션</label>
-      <select th:field="*{locationId}" class="form-control">
-        <option value="">-- 로케이션 선택 --</option>
-        <option th:each="loc : ${locations}"
-                th:value="${loc.id}"
-                th:text="${loc.locCode} + ' (' + ${loc.warehouseName} + ')'">
-        </option>
-      </select>
-      <p th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></p>
-    </div>
 
     <!-- 상품 선택 -->
     <div>
       <label>상품</label>
-      <select th:field="*{itemId}" class="form-control">
-        <option value="">-- 상품 선택 --</option>
+      <select th:field="*{itemId}" id="item-select" class="form-control">
+        <option value="">-- 상품 을 먼저 선택하세요 --</option>
         <option th:each="item : ${items}"
                 th:value="${item.id}"
                 th:text="'[' + ${item.barcode} + '] ' + ${item.name}">
@@ -36,10 +24,22 @@
       <p th:if="${#fields.hasErrors('itemId')}" th:errors="*{itemId}"></p>
     </div>
 
+    <!-- 로케이션 선택 -->
+    <div>
+      <label>로케이션</label>
+      <select th:field="*{locationId}" id="location-select" class="form-control">
+        <option value="">-- 상품 선택시 목록이 나타납니다. --</option>
+<!--        <option th:each="loc : ${locations}"-->
+<!--                th:value="${loc.id}"-->
+<!--                th:text="${loc.locCode} + ' (' + ${loc.warehouseName} + ')'">-->
+<!--        </option>-->
+      </select>
+      <p th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></p>
+    </div>
     <!-- 수량 입력 -->
     <div>
       <label>수량</label>
-      <input type="number" th:field="*{quantity}" class="form-control" min="1">
+      <input type="number" th:field="*{quantity}" class="form-control" min="1" required>
       <p th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></p>
     </div>
 
@@ -56,5 +56,46 @@
     <button type="submit" class="btn btn-primary">등록</button>
   </form>
 </div>
+<script>
+  document.getElementById("item-select").addEventListener('change',function(){
+    const itemId = this.value;
+    const locationSelect = document.getElementById("location-select");
+
+    //상품 선택이 해제된 경우 초기화
+    if(!itemId) {
+      locationSelect.innerHTML ='<option value="">--- 상품을 먼저 선택하세요 ---</option>';
+      return;
+    }
+    //로딩 중 표시할 화면
+    locationSelect.innerHTML = '<option value="">--- 로케이션을 불러오는중... ---</option>'
+
+    //서버 REST API 호출
+    fetch(`/stocks/api/locations?itemId=${itemId}`)
+            .then(response =>{
+              if(!response.ok) throw new Error('네트워크 응답에 문제가 발생했습니다.')
+              return response.json();
+            })
+            .then(data => {
+              locationSelect.innerHTML = '<option value="">--- 로케이션 선택 ---</option>';
+
+              if(data.length === 0){
+                locationSelect.innerHTML = '<option value="">--- 입고 가능한 로케이션이 없습니다. ---</option>';
+                return;
+              }
+
+              data.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc.id;
+                option.text = `${loc.warehouseName}[${loc.locCode}]`;
+                locationSelect.appendChild(option);
+              })
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              locationSelect.innerHTML = '<option value="">--- 로케이션을 불러오지 못했습니다. ---</option>';
+            })
+
+  })
+</script>
 </body>
 </html>
