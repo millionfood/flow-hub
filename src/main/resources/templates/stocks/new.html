@@ -15,7 +15,7 @@
     <div>
       <label>상품</label>
       <select th:field="*{itemId}" id="item-select" class="form-control">
-        <option value="">-- 상품 을 먼저 선택하세요 --</option>
+        <option value="">-- 상품을 먼저 선택하세요 --</option>
         <option th:each="item : ${items}"
                 th:value="${item.id}"
                 th:text="'[' + ${item.barcode} + '] ' + ${item.name}">
@@ -45,7 +45,7 @@
 
     <div>
       <label>재고 상태</label>
-      <select th:field="*{status}" class="form-control">
+      <select th:field="*{status}" class="form-control" required>
         <option value="">상태 선택</option>
         <option th:each="status : ${stockStatus}"
                 th:value="${status}"
