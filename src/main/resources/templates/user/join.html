@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Flow-Hub | 회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container { max-width: 500px; margin-top: 50px; }
+        .error-text { color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+<div class="container shadow p-4 rounded bg-white">
+    <h2 class="mb-4 text-center">Flow-Hub 회원가입</h2>
+
+    <!-- th:object="${userJoinRequest}"는 컨트롤러에서 넘겨줄 DTO 이름에 맞게 수정하셔도 됩니다 -->
+    <form th:action="@{/user/join}" th:object="${userRegisterDto}" id="join-form" method="post">
+
+        <!-- 이메일 입력 -->
+        <div class="mb-3">
+            <label for="email" class="form-label">이메일 주소</label>
+            <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="example@flowhub.com" required>
+            <div id="email-feedback" class="feedback-text"></div>
+            <p class="error-text" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        </div>
+
+        <!-- 비밀번호 입력 -->
+        <div class="mb-3">
+            <label for="password" class="form-label">비밀번호</label>
+            <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="비밀번호를 입력하세요" required>
+            <p class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+        </div>
+
+        <!-- 이름 입력 -->
+        <div class="mb-3">
+            <label for="name" class="form-label">이름</label>
+            <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="이름을 입력하세요" required>
+            <p class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-block">회원가입</button>
+            <a th:href="@{/users/login}" class="btn btn-link text-center">이미 계정이 있으신가요? 로그인</a>
+        </div>
+    </form>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let isEmailValid = false;
+        const joinForm = document.getElementById('join-form');
+        const emailInput = document.getElementById('email');
+        emailInput.addEventListener('blur', function(){
+            const email = this.value.trim();
+            const feedback = document.getElementById('email-feedback');
+            const submitBtn = document.getElementById('submit-btn');
+
+            if(!email){
+                feedback.className = 'feedback-text text-danger';
+                feedback.innerText = '이메일은 필수 입력 항목입니다.';
+                isEmailValid = false;
+                return;
+            }
+            //이메일 형식 체크
+            const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+            if(!emailRegex.test(email)){
+                feedback.className = 'feedback-text text-danger';
+                feedback.innerText = '올바른 이메일 형식이 아닙니다.';
+                isEmailValid = false;
+                return;
+            }
+
+            feedback.className = 'feedback-text text-secondary';
+            feedback.innerText = '중복 확인 중.....';
+
+            //서버 api 호출(중복 체크)
+            fetch(`/user/api/check-email?email=${encodeURIComponent(email)}`)
+                .then(res =>{
+                    if(!res.ok) throw new Error('네트워크 응답에 문제가 발생했습니다.');
+                    return res.json();
+                })
+                .then(data =>{
+                    if(data.available){
+                        feedback.className = 'feedback-text text-success';
+                        feedback.innerText = data.message;
+                        isEmailValid = true;
+                    }else{
+                        feedback.className = 'feedback-text text-danger';
+                        feedback.innerText = data.message;
+                        isEmailValid = false;
+                    }
+                })
+                .catch(err =>{
+                    console.error('Error:',err);
+                    feedback.className = 'feedback-text text-danger';
+                    feedback.innerText = '이메일 중복 확인에 실패했습니다.';
+                    isEmailValid = false;
+                });
+        })
+        joinForm.addEventListener('submit', function(e){
+            if(!isEmailValid){
+                e.preventDefault();
+                alert('이메일을 다시 확인해 주세요')
+                emailInput.focus();
+            }
+        })
+    })
+
+</script>
+</body>
+</html>
