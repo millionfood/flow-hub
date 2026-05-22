@@ -21,8 +21,9 @@ public class SecurityConfig {
             //csrf 보안 기능 우선 비활성화 (개발 편의상) - 나중에 켜야함
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/user/join","/user/login","/user/api/**").permitAll()
-                    .anyRequest().authenticated()
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/user/join","/user/login","/user/api/**")
+                    .permitAll().anyRequest().authenticated()
             )
             .formLogin(form -> form
                     .loginPage("/user/login")

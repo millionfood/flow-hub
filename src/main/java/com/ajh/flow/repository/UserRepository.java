@@ -24,8 +24,14 @@ public class UserRepository {
     //-----------------조회-----------------
     public List<UserDetailDto> findAll() {
         String jpql = "select new com.ajh.flow.dto.user.UserDetailDto("+
-                "u.email,u.password,u.name,u.role)"+
+                "u.id,u.email,u.password,u.name,u.role,u.useYn)"+
                 "from User u ";
+        return em.createQuery(jpql, UserDetailDto.class).getResultList();
+    }
+    public List<UserDetailDto> findUsers(){
+        String jpql = "select new com.ajh.flow.dto.user.UserDetailDto("+
+                "u.id,u.email,u.password,u.name,u.role,u.useYn)"+
+                "from User u where u.role != ADMIN";
         return em.createQuery(jpql, UserDetailDto.class).getResultList();
     }
     public Optional<User> findById(Long id) {
@@ -40,7 +46,7 @@ public class UserRepository {
     }
     public Optional<UserDetailDto> findDetailDtoById(Long id) {
         String jpql = "select new com.ajh.flow.dto.user.UserDetailDto("+
-                "u.email,u.password,u.name,u.role)"+
+                "u.id,u.email,u.password,u.name,u.role,u.useYn)"+
                 "from User u "+
                 "where u.id = :id";
         return em.createQuery(jpql, UserDetailDto.class)
@@ -49,7 +55,7 @@ public class UserRepository {
     }
     public Optional<UserDetailDto> findDetailDtoByEmail(String email) {
         String jpql = "select new com.ajh.flow.dto.user.UserDetailDto("+
-                "u.email,u.password,u.name,u.role)"+
+                "u.id,u.email,u.password,u.name,u.role,u.useYn)"+
                 "from User u "+
                 "where u.email = :email";
         return em.createQuery(jpql, UserDetailDto.class)
@@ -66,7 +72,6 @@ public class UserRepository {
     }
 
     //-----------------수정-----------------
-
 
     //-----------------상태변경-----------------
 }

@@ -45,6 +45,9 @@ public class UserService {
     public List<UserDetailDto> findAll() {
         return userRepository.findAll();
     }
+    public List<UserDetailDto> findUsers(){
+        return userRepository.findUsers();
+    }
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
