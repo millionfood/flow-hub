@@ -2,6 +2,7 @@ package com.ajh.flow.domain;
 
 import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.constant.UserRole;
+import com.ajh.flow.dto.user.UserUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,11 +43,18 @@ public class User extends BaseEntity{
     }
 
     //-----------------비즈니스 로직-----------------
-    public void StopUse(){
+    public void stopUse(){
         this.useYn = UseYn.N;
     }
 
-    public void ReUse(){
+    public void reUse(){
         this.useYn = UseYn.Y;
+    }
+
+    public void update(UserUpdateDto dto){
+        this.name = dto.getName();
+        if(dto.getPassword() != null && !dto.getPassword().isBlank()){
+            this.password = dto.getPassword();
+        }
     }
 }

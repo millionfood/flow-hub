@@ -11,7 +11,7 @@ import java.util.Collection;
 @Getter
 public class PrincipalDetails implements UserDetails {
 
-    private final User user;
+    private User user;
 
     public PrincipalDetails(User user) {
         this.user = user;
@@ -34,6 +34,10 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    public void updateUser(User user) {
+        this.user = user;
     }
 
     @Override

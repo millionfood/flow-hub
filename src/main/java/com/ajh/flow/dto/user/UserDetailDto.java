@@ -5,8 +5,9 @@ import com.ajh.flow.domain.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 public class UserDetailDto {
 
@@ -25,20 +26,9 @@ public class UserDetailDto {
         this.role = user.getRole();
     }
 
-    @NotNull(message = "email은 필수 입력 값입니다.")
     private String email;
-    @NotNull(message = "password는 필수 입력 값입니다.")
     private String password;
-    @NotNull(message = "name은 필수 입력 값입니다.")
     private String name;
-    private UserRole role = UserRole.USER;
+    private UserRole role;
 
-    public User toVo() {
-        return User.builder()
-                .email(this.email)
-                .password(this.password)
-                .name(this.name)
-                .role(this.role)
-                .build();
-    }
 }
