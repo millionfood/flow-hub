@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- th:fragment="adminNavbar" 로 이 네비바의 이름을 지정합니다 -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <!-- 시스템 로고 / 메인 홈 링크 -->
+        <a class="navbar-brand fw-bold text-success" th:href="@{/}">FlowHub WMS</a>
+
+        <button class="navbar-expand-lg navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <!-- 1. 물류 관리 핵심 기능 드롭다운 메뉴 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="wmsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        WMS 물류 관리
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="wmsDropdown">
+                        <li><a class="dropdown-item" th:href="@{/warehouses/list}">창고 관리 (Warehouse)</a></li>
+                        <li><a class="dropdown-item" th:href="@{/location/list}">로케이션 관리 (Location)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/items/list}">아이템 관리 (Item)</a></li>
+                        <li><a class="dropdown-item" th:href="@{/stocks/list}">실시간 재고 관리 (Stock)</a></li>
+                    </ul>
+                </li>
+
+                <!-- 2. 회원 관리 단독 메뉴 -->
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link fw-bold text-light" th:href="@{/admin/users}">전체 회원 관리 (Admin)</a>
+                </li>
+
+                <!-- [B] 일반 유저 권한(ROLE_USER)을 가진 사람에게만 보이는 메뉴 -->
+                <li class="nav-item" sec:authorize="hasRole('USER')">
+                    <a class="nav-link" th:href="@{/user/detail}">마이페이지 (User)</a>
+                </li>
+
+            </ul>
+
+            <!-- 우측 상단 유저 정보 및 로그아웃 버튼 -->
+            <div class="d-flex align-items-center text-light" sec:authorize="isAuthenticated()">
+                <span sec:authorize="hasRole('ADMIN')">
+                    <span sec:authentication="principal.userRealName">Admin</span> 관리자님
+                </span>
+
+                <span sec:authorize="hasRole('USER')">
+                    <span sec:authentication="principal.userRealName">User</span> 회원님
+                </span>
+
+                <a th:href="@{/user/logout}" class="btn btn-outline-light btn-sm ms-3">로그아웃</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+</html>

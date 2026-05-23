@@ -36,6 +36,8 @@ public class PrincipalDetails implements UserDetails {
         return user.getEmail();
     }
 
+    public String getUserRealName(){return  user.getName();}
+
     public void updateUser(User user) {
         this.user = user;
     }
