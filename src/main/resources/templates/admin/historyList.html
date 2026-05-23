@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Flow-Hub | 변경 이력 통합 모니터링</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container mt-5">
+
+    <!-- 🎛️ 상단 물류 통합 대시보드 탭 -->
+    <div class="card p-2 mb-4 shadow-sm bg-white">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/users}">👑 시스템 회원 관리</a></li>
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/warehouses}">🏢 창고 정보 인벤토리</a></li>
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/locations}">📍 세부 로케이션(랙) 현황</a></li>
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/items}">📦 상품 아이템 및 재고</a></li>
+            <li class="nav-item"><a class="nav-link active bg-dark" th:href="@{/admin/histories}">📜 시스템 변경 이력</a></li>
+        </ul>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2>📜 시스템 변경 이력 통합 모니터링 (감사 로그)</h2>
+
+        <a th:href="@{/admin/users}" class="btn btn-outline-primary btn-sm">회원 관리로 이동</a>
+    </div>
+
+    <!-- 🔍 동적 검색 필터 폼 바 (조회 버튼 누르면 URL 파라미터를 들고 현재 페이지를 새로고침합니다) -->
+    <div class="card shadow-sm bg-white p-3 mb-4">
+        <form th:action="@{/admin/histories}" method="get" class="row g-3 align-items-center">
+
+            <!-- 1. 액션 타입 선택 필터 -->
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">액션 유형</label>
+                <select name="type" class="form-select form-select-sm">
+                    <option value="">전체 보기</option>
+                    <!-- 💡 컨트롤러에서 넘어온 cond 객체의 값을 비교해서 선택 상태(selected)를 유지합니다 -->
+                    <option value="DISABLE" th:selected="${cond.type == 'DISABLE'}">계정 정지</option>
+                    <option value="ENABLE" th:selected="${cond.type == 'ENABLE'}">계정 활성화</option>
+                </select>
+            </div>
+
+            <!-- 2. 행위 관리자 검색 입력란 -->
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">처리 관리자</label>
+                <input type="text" name="adminSearch" th:value="${cond.adminSearch}" class="form-control form-control-sm" placeholder="이름 또는 이메일 검색">
+            </div>
+
+            <!-- 3. 대상 사용자 검색 입력란 -->
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">대상 사용자</label>
+                <input type="text" name="targetSearch" th:value="${cond.targetSearch}" class="form-control form-control-sm" placeholder="이름 또는 이메일 검색">
+            </div>
+
+            <!-- 4. 하이브리드 사유 키워드 검색 입력란 -->
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">사유 키워드</label>
+                <input type="text" name="remarkKeyword" th:value="${cond.remarkKeyword}" class="form-control form-control-sm" placeholder="단어 키워드 검색">
+            </div>
+
+            <!-- 검색 실행 버튼 -->
+            <div class="col-md-1 align-self-end">
+                <button type="submit" class="btn btn-dark btn-sm w-100">조회</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 📊 히스토리 목록 테이블 출력단 -->
+    <div class="card shadow-sm bg-white p-3">
+        <table class="table table-hover align-middle text-center small">
+            <thead class="table-dark">
+            <tr>
+                <th style="width: 8%;">로그 ID</th>
+                <th style="width: 12%;">구분</th>
+                <th style="width: 22%;">처리 관리자</th>
+                <th style="width: 15%;">대상 사용자</th>
+                <th class="text-start" style="width: 28%;">상세 감사 비고 (Hybrid Remark)</th>
+                <th style="width: 15%;">기록 일시</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 💡 컨트롤러가 넘겨준 DTO 리스트(histories)를 반복문 돌립니다 -->
+            <tr th:each="h : ${histories}">
+                <td th:text="${h.id}">1</td>
+                <td>
+                    <!-- 💡 DTO에서 꺼낸 텍스트형 필드들로 배지 스타일을 분기합니다 -->
+                    <span th:text="${h.type}"
+                          th:classappend="${h.type == 'DISABLE' ? 'badge bg-danger' : 'badge bg-success'}">
+                        계정정지
+                    </span>
+                </td>
+                <!-- 💡 가공이 끝난 "이름 (이메일)" 문자열을 다이렉트로 출력 -->
+                <td th:text="${h.adminName}">최고관리자 (admin@flow.com)</td>
+                <td th:text="${h.targetUserName}">일반유저A</td>
+
+                <!-- 💡 우리가 열심히 빌드한 시스템 정형화 하이브리드 문구 출력 (가독성 위해 왼쪽 정렬) -->
+                <td th:text="${h.remark}" class="text-start text-secondary fw-semibold" style="white-space: pre-line;">
+                    [계정정지] 처리자: ... | 사유: ...
+                </td>
+
+                <!-- 💡 백엔드 자바에서 포맷팅을 완전히 끝내고 넘긴 문자열이므로 그냥 출력하면 끝! -->
+                <td th:text="${h.createdDateStr}">2026-05-23 12:00:00</td>
+            </tr>
+
+            <!-- 💡 필터 조건으로 검색했을 때 일치하는 로그 데이터가 0건일 때 보여줄 방어벽 화면 -->
+            <tr th:if="${#lists.isEmpty(histories)}">
+                <td colspan="6" class="text-muted py-4">조건에 부합하는 시스템 이력 로그가 존재하지 않습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

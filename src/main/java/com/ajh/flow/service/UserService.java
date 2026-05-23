@@ -1,11 +1,14 @@
 package com.ajh.flow.service;
 
+import com.ajh.flow.common.constant.UserHistoryType;
 import com.ajh.flow.common.exception.DuplicateEntityException;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.domain.User;
+import com.ajh.flow.domain.UserHistory;
 import com.ajh.flow.dto.user.UserDetailDto;
 import com.ajh.flow.dto.user.UserRegisterDto;
 import com.ajh.flow.dto.user.UserUpdateDto;
+import com.ajh.flow.repository.HistoryRepository;
 import com.ajh.flow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final HistoryRepository historyRepository;
     private final PasswordEncoder passwordEncoder;
 
     //-----------------회원가입-----------------
@@ -81,10 +85,44 @@ public class UserService {
         user.stopUse();
     }
     @Transactional
+    public void stopUserByAdmin(Long id, String reason, User admin) {
+        User user = userRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        //유저 상태 변경
+        user.stopUse();
+        //history
+        String hybridRemark = String.format("처리자 : %s(%s)\n사유: %s",admin.getName(),admin.getEmail(),reason);
+        UserHistory userHistory = UserHistory.builder()
+                .admin(admin)
+                .targetUser(user)
+                .type(UserHistoryType.DISABLE)
+                .remark(hybridRemark)
+                .build();
+
+        historyRepository.saveUserHistory(userHistory);
+    }
+    @Transactional
     public void resumeUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         user.reUse();
+    }
+    @Transactional
+    public void resumeUserByAdmin(Long id, String reason, User admin) {
+        User user = userRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
+        //유저 상태 변경
+        user.reUse();
+        //history
+        String hybridRemark = String.format("처리자 : %s(%s)\n사유: %s",admin.getName(),admin.getEmail(),reason);
+        UserHistory userHistory = UserHistory.builder()
+                .admin(admin)
+                .targetUser(user)
+                .type(UserHistoryType.DISABLE)
+                .remark(hybridRemark)
+                .build();
+
+        historyRepository.saveUserHistory(userHistory);
     }
 
     //-----------------기타-----------------
