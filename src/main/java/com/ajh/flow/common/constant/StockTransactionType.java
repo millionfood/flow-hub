@@ -8,7 +8,8 @@ public enum StockTransactionType {
     OUT("출고"),
     MOVE("이동"),
     ADJ("재고조정"),
-    RETURN("반품");
+    RETURN("반품"),
+    DELETE("폐기");
 
     private final String description;
 
