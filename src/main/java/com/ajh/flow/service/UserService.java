@@ -118,7 +118,7 @@ public class UserService {
         UserHistory userHistory = UserHistory.builder()
                 .admin(admin)
                 .targetUser(user)
-                .type(UserHistoryType.DISABLE)
+                .type(UserHistoryType.ENABLE)
                 .remark(hybridRemark)
                 .build();
 

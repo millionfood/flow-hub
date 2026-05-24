@@ -157,14 +157,23 @@ public class StockService {
         //3-1.없다면 신규 입고 로직
         if(newStockList == null ||newStockList.isEmpty()){
             //새로운 곳의 재고 등록
-            returnValue = registerStockWithSecurity(new StockRegisterDto(dto),user);
+            Stock stock = Stock.builder()
+                    .item(item)
+                    .location(toLocation)
+                    .quantity(dto.getMoveQuantity())
+                    .status(dto.getStatus())
+                    .build();
+            stockRepository.save(stock);
+            returnValue = stock.getId();
+            //히스토리 기록 - 기존 재고의 증가
+            StockHistory newHistory = StockHistory.createStockHistory(oldStock,user,dto.getMoveQuantity(),StockTransactionType.MOVE,"기존 재고 감소.");
+            historyRepository.saveStockHistory(newHistory);
 
             //기존 재고의 감소/삭제
             minusOrRemove(oldStock,dto);
-
             //히스토리 기록 - 기존 재고의 감소
-            StockHistory history = StockHistory.createStockHistory(oldStock,user,dto.getMoveQuantity(),StockTransactionType.IN,"기존 재고 감소.");
-            historyRepository.saveStockHistory(history);
+            StockHistory oldHistory = StockHistory.createStockHistory(oldStock,user,-dto.getMoveQuantity(),StockTransactionType.MOVE,"기존 재고 감소.");
+            historyRepository.saveStockHistory(oldHistory);
         }else{
             //3-2.있다면 동일한 상품인가? - 하나만 확인하면 됨, 어차피 상품은 동일
             if(oldStock.getItem().getId().equals(newStockList.getFirst().getItem().getId())){
@@ -183,15 +192,24 @@ public class StockService {
                     historyRepository.saveStockHistory(history);
                 }else{
                     //같은 아이템이지만 다른 상태의 재고라면 새로운 재고 추가(
-                    returnValue = registerStockWithSecurity(new StockRegisterDto(dto),user);
-                    //히스토리 기록 - registerStockWithSecurity 안에 있음
+                    Stock stock = Stock.builder()
+                            .item(item)
+                            .location(toLocation)
+                            .quantity(dto.getMoveQuantity())
+                            .status(dto.getStatus())
+                            .build();
+                    stockRepository.save(stock);
+                    returnValue =  stock.getId();
+                    //히스토리 기록 - 새로운 재고 추가
+                    StockHistory newHistory = StockHistory.createStockHistory(oldStock,user,-dto.getMoveQuantity(),StockTransactionType.MOVE,"기존 재고 감소.");
+                    historyRepository.saveStockHistory(newHistory);
                 }
                 //기존 재고 감소/삭제
                 minusOrRemove(oldStock,dto);
 
                 //히스토리 기록 - 기존 재고의 감소
-                StockHistory history = StockHistory.createStockHistory(oldStock,user,dto.getMoveQuantity(),StockTransactionType.OUT,"기존 재고 감소.");
-                historyRepository.saveStockHistory(history);
+                StockHistory oldHistory = StockHistory.createStockHistory(oldStock,user,-dto.getMoveQuantity(),StockTransactionType.MOVE,"기존 재고 감소.");
+                historyRepository.saveStockHistory(oldHistory);
 
             }else{
                 //3-4.동일한 상품이 아니라면 재고 추가 x (한 로케이션에 하나의 상품만)
@@ -207,7 +225,7 @@ public class StockService {
         Stock  stock = findById(id);
         stockRepository.delete(id);
         //히스토리 기록 - 기존 재고의 삭제
-        StockHistory history = StockHistory.createStockHistory(stock,user,stock.getQuantity(),StockTransactionType.DELETE,"기존 재고 폐기.");
+        StockHistory history = StockHistory.createStockHistory(stock,user,stock.getQuantity(),StockTransactionType.OUT,"기존 재고 폐기.");
         historyRepository.saveStockHistory(history);
     }
 

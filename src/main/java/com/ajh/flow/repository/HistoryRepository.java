@@ -3,6 +3,7 @@ package com.ajh.flow.repository;
 import com.ajh.flow.domain.StockHistory;
 import com.ajh.flow.domain.UserHistory;
 import com.ajh.flow.dto.history.HistorySearchCond;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class HistoryRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory jpaQueryFactory;
 
     //-----------------User-----------------
     public void saveUserHistory(UserHistory userHistory) {

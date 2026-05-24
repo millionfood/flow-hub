@@ -17,28 +17,35 @@
             <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/warehouses}">🏢 창고 정보 인벤토리</a></li>
             <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/locations}">📍 세부 로케이션(랙) 현황</a></li>
             <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/admin/items}">📦 상품 아이템 및 재고</a></li>
-            <li class="nav-item"><a class="nav-link active bg-dark" th:href="@{/admin/histories}">📜 시스템 변경 이력</a></li>
+            <li class="nav-item"><a class="nav-link active bg-dark" th:href="@{/admin/histories/user}">📜 시스템 변경 이력</a></li>
         </ul>
     </div>
 
+    <!-- 📑 서브 토글 탭 (유저 이력과 재고 이력을 공평하게 스위칭하는 장치) -->
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-        <h2>📜 시스템 변경 이력 통합 모니터링 (감사 로그)</h2>
-
-        <a th:href="@{/admin/users}" class="btn btn-outline-primary btn-sm">회원 관리로 이동</a>
+        <div class="d-flex align-items-center gap-3">
+            <h2>📜 시스템 변경 이력 통합 모니터링 (감사 로그)</h2>
+            <div class="btn-group btn-group-sm ms-2" role="group">
+                <!-- 유저 히스토리 뷰로 이동하는 버튼 -->
+                <a th:href="@{/admin/histories/user}" class="btn btn-dark active">👤 회원 상태 변경 이력</a>
+                <!-- 현재 보고 있는 재고 히스토리 활성화 상태 -->
+                <a th:href="@{/admin/histories/stock}" class="btn btn-outline-dark">📦 상품 및 물류 변동 이력</a>
+            </div>
+        </div>
     </div>
 
     <!-- 🔍 동적 검색 필터 폼 바 (조회 버튼 누르면 URL 파라미터를 들고 현재 페이지를 새로고침합니다) -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/histories}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/histories/user}" method="get" class="row g-3 align-items-center">
 
             <!-- 1. 액션 타입 선택 필터 -->
             <div class="col-md-2">
                 <label class="form-label small fw-bold">액션 유형</label>
-                <select name="type" class="form-select form-select-sm">
+                <select name="userType" class="form-select form-select-sm">
                     <option value="">전체 보기</option>
                     <!-- 💡 컨트롤러에서 넘어온 cond 객체의 값을 비교해서 선택 상태(selected)를 유지합니다 -->
-                    <option value="DISABLE" th:selected="${cond.type == 'DISABLE'}">계정 정지</option>
-                    <option value="ENABLE" th:selected="${cond.type == 'ENABLE'}">계정 활성화</option>
+                    <option value="DISABLE" th:selected="${cond.userType == 'DISABLE'}">계정 정지</option>
+                    <option value="ENABLE" th:selected="${cond.userType == 'ENABLE'}">계정 활성화</option>
                 </select>
             </div>
 
