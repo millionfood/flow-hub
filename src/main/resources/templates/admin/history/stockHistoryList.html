@@ -36,7 +36,7 @@
 
     <!-- 🔍 동적 검색 필터 폼 바 (대통합 HistorySearchCond 연동) -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/histories}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/histories/stock}" method="get" class="row g-3 align-items-center">
             <!-- 하이든 파라미터로 현재 재고 이력 탭 타겟임을 서버에 명시 -->
             <input type="hidden" name="historyTarget" value="STOCK">
 
@@ -45,9 +45,9 @@
                 <label class="form-label small fw-bold text-secondary">작업 구분</label>
                 <select name="moveType" class="form-select form-select-sm">
                     <option value="">전체 작업</option>
-                    <option value="IN" th:selected="${cond.moveType == 'IN'}">📥 정상 입고</option>
-                    <option value="OUT" th:selected="${cond.moveType == 'OUT'}">📤 정상 출고</option>
-                    <option value="MOVE" th:selected="${cond.moveType == 'MOVE'}">🔄 로케이션 이동</option>
+                    <option value="IN" th:selected="${cond.moveType == 'IN'}">📥 입고 (IN)</option>
+                    <option value="MOVE" th:selected="${cond.moveType == 'MOVE'}">🔄 이동 (MOVE)</option>
+                    <option value="OUT" th:selected="${cond.moveType == 'OUT'}">📤 출고 (OUT)</option>
                 </select>
             </div>
 
