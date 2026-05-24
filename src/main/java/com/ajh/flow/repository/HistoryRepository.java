@@ -28,7 +28,7 @@ public class HistoryRepository {
                 "join fetch h.targetUser t "+
                 "where 1=1";
         //조건에 다른 동적 JPQL 문자열 조립
-        if(cond.getType() != null){
+        if(cond.getUserType() != null){
             jpql += " and h.type = :type";
         }
         if(StringUtils.hasText(cond.getAdminSearch())){
@@ -46,8 +46,8 @@ public class HistoryRepository {
         TypedQuery<UserHistory> query = em.createQuery(jpql, UserHistory.class);
 
         //조립된 쿼리에 파라미터 바인딩
-        if(cond.getType() != null){
-            query.setParameter("type", cond.getType());
+        if(cond.getUserType() != null){
+            query.setParameter("type", cond.getUserType());
         }
         if(StringUtils.hasText(cond.getAdminSearch())){
             query.setParameter("adminSearch", cond.getAdminSearch());
@@ -66,5 +66,53 @@ public class HistoryRepository {
     //-----------------Item-----------------
     public void saveStockHistory(StockHistory stockHistory) {
         em.persist(stockHistory);
+    }
+
+    public List<StockHistory> findAllStockHistory(HistorySearchCond cond) {
+        String jpql = "select h from StockHistory h "+
+                "join fetch h.user u " +
+                "join fetch h.item i " +
+                "join fetch h.location l " +
+                "join fetch h.warehouse w " +
+                "where 1=1";
+        //조건에 다른 동적 JPQL 문자열 조립
+        if(cond.getMoveType() != null){
+            jpql += " and h.type = :type";
+        }
+        if(StringUtils.hasText(cond.getOperatorName())){
+            jpql += " and u.name like concat('%', :operatorName, '%')";
+        }
+        if(StringUtils.hasText(cond.getItemSearch())){
+            jpql += " and (i.name like concat('%', :itemSearch, '%') or i.barcode like concat('%', :itemSearch, '%'))";
+        }
+        if(cond.getLocationId() != null){
+            jpql += " and l.id = :locationId";
+        }
+        if(cond.getWarehouseId() != null){
+            jpql += " and w.id = :warehouseId";
+        }
+        //최신 로그 순 정렬
+        jpql += " order by h.id desc";
+
+        TypedQuery<StockHistory> query = em.createQuery(jpql, StockHistory.class);
+
+        //조립된 쿼리에 파라미터 바인딩
+        if(cond.getMoveType() != null){
+            query.setParameter("type", cond.getMoveType());
+        }
+        if(StringUtils.hasText(cond.getOperatorName())){
+            query.setParameter("operatorName", cond.getOperatorName());
+        }
+        if(StringUtils.hasText(cond.getItemSearch())){
+            query.setParameter("itemSearch", cond.getItemSearch());
+        }
+        if(cond.getLocationId() != null){
+            query.setParameter("locationId", cond.getLocationId());
+        }
+        if(cond.getWarehouseId() != null){
+            query.setParameter("warehouseId", cond.getWarehouseId());
+        }
+
+        return query.getResultList();
     }
 }

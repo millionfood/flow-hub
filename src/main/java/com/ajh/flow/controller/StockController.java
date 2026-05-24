@@ -2,6 +2,7 @@ package com.ajh.flow.controller;
 
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.domain.Item;
+import com.ajh.flow.domain.PrincipalDetails;
 import com.ajh.flow.domain.Stock;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.stock.StockDetailDto;
@@ -16,6 +17,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,9 +49,9 @@ public class StockController {
     }
     //입고 실행 처리
     @PostMapping("/new")
-    public String create(@ModelAttribute("inboundForm") StockRegisterDto form) {
+    public String create(@ModelAttribute("inboundForm") StockRegisterDto form, @AuthenticationPrincipal PrincipalDetails principalDetails, BindingResult bindingResult) {
 
-        stockService.registerStock(form);
+        stockService.registerStockWithSecurity(form, principalDetails.getUser());
         return "redirect:/stocks/list";
     }
 
@@ -74,8 +77,8 @@ public class StockController {
         return "stocks/edit";
     }
     @PostMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, @ModelAttribute("stockUpdateDto") StockUpdateDto dto) {
-        stockService.updateStock(id, dto);
+    public String edit(@PathVariable Long id, @ModelAttribute("stockUpdateDto") StockUpdateDto dto, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        stockService.updateStock(id, dto, principalDetails.getUser());
         return "redirect:/stocks/list";
     }
     //재고 이동
@@ -89,7 +92,8 @@ public class StockController {
         return "stocks/move";
     }
     @PostMapping("/move/{id}")
-    public String move(@PathVariable Long id, @Valid @ModelAttribute("stockMoveDto") StockMoveDto dto, BindingResult result, Model model) {
+    public String move(@PathVariable Long id, @Valid @ModelAttribute("stockMoveDto") StockMoveDto dto,
+                       BindingResult result, Model model, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         StockDetailDto detailDto = stockService.findDetailDtoById(id);
         if (result.hasErrors()) {
             log.error("Stock Move Error : {}",result.getAllErrors());
@@ -99,13 +103,13 @@ public class StockController {
             model.addAttribute("moveableLocations",locationService.findMoveableLocations(detailDto.getItemId(),detailDto.getLocationId()));
             return "stocks/move";
         }
-        stockService.moveStock(id,dto);
+        stockService.moveStock(id,dto,principalDetails.getUser());
         return "redirect:/stocks/list";
     }
     //-----------------삭제-----------------
     @PostMapping("delete/{id}")
-    public String delete(@PathVariable Long id, Model model) {
-        stockService.deleteStock(id);
+    public String delete(@PathVariable Long id, Model model, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        stockService.deleteStock(id, principalDetails.getUser());
         return "redirect:/stocks/list";
     }
 

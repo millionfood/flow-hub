@@ -5,13 +5,12 @@ import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InsufficientStockException;
 import com.ajh.flow.common.exception.InvalidStockException;
-import com.ajh.flow.domain.Item;
-import com.ajh.flow.domain.Location;
-import com.ajh.flow.domain.Stock;
+import com.ajh.flow.domain.*;
 import com.ajh.flow.dto.stock.StockDetailDto;
 import com.ajh.flow.dto.stock.StockMoveDto;
 import com.ajh.flow.dto.stock.StockRegisterDto;
 import com.ajh.flow.dto.stock.StockUpdateDto;
+import com.ajh.flow.repository.HistoryRepository;
 import com.ajh.flow.repository.ItemRepository;
 import com.ajh.flow.repository.LocationRepository;
 import com.ajh.flow.repository.StockRepository;
@@ -32,10 +31,49 @@ public class StockService {
     private final StockRepository stockRepository;
     private final LocationRepository locationRepository;
     private final ItemRepository itemRepository;
+    private final HistoryRepository historyRepository;
 
 
 
     //-----------------등록-------------------
+    //재고 입고
+    @Transactional
+    public Long registerStockWithSecurity(StockRegisterDto dto, User user){
+        Location location = locationRepository.findById(dto.getLocationId())
+                .orElseThrow(EntityNotFoundException::new);
+        Item item = itemRepository.findById(dto.getItemId())
+                .orElseThrow(EntityNotFoundException::new);
+
+        //로케이션과 상품이 현재 사용 가능한 상태인지 확인
+        existLocationAndItem(location, item);
+
+        //로케이션에 동일한 상태의 아이템이 있는지 확인
+        return stockRepository.find_Same_Location_Item_Status(location.getId(),item.getId(),dto.getStatus())
+                .map(stock ->{
+                    stock.addQuantity(dto.getQuantity());
+
+                    //히스토리 기록
+                    StockHistory history = StockHistory.createStockHistory(stock,user,dto.getQuantity(),StockTransactionType.IN,"기존재고 추가.");
+                    historyRepository.saveStockHistory(history);
+                    return stock.getId();
+                })
+                .orElseGet(()->{
+                    Stock stock = Stock.builder()
+                            .item(item)
+                            .location(location)
+                            .quantity(dto.getQuantity())
+                            .status(dto.getStatus())
+                            .build();
+                    stockRepository.save(stock);
+
+                    //히스토리 기록
+                    StockHistory history = StockHistory.createStockHistory(stock,user,dto.getQuantity(),StockTransactionType.IN,"새로운 재고 입고.");
+                    historyRepository.saveStockHistory(history);
+                    return stock.getId();
+                });
+
+    }
+    //테스트용
     //재고 입고
     @Transactional
     public Long registerStock(StockRegisterDto dto){
@@ -62,7 +100,6 @@ public class StockService {
                             .build();
 
                     stockRepository.save(stock);
-                    //재고 이력 남기기
                     return stock.getId();
                 });
 
@@ -88,15 +125,19 @@ public class StockService {
     //-----------------상태변경-------------------
     //단순 수정
     @Transactional
-    public void updateStock(Long id, StockUpdateDto dto){
+    public void updateStock(Long id, StockUpdateDto dto, User user){
         Stock stock = stockRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         stock.update(dto);
+
+        //히스토리 기록
+        StockHistory history = StockHistory.createStockHistory(stock,user,dto.getQuantity(),StockTransactionType.ADJ,"기존 재고 수정.");
+        historyRepository.saveStockHistory(history);
     }
 
     //재고 이동
     @Transactional
-    public Long moveStock(Long id, StockMoveDto dto){
+    public Long moveStock(Long id, StockMoveDto dto, User user){
         Long returnValue;
         Stock oldStock = findById(id);
         Location toLocation = locationRepository.findById(dto.getToLocationId())
@@ -116,10 +157,14 @@ public class StockService {
         //3-1.없다면 신규 입고 로직
         if(newStockList == null ||newStockList.isEmpty()){
             //새로운 곳의 재고 등록
-            returnValue = registerStock(new StockRegisterDto(dto));
+            returnValue = registerStockWithSecurity(new StockRegisterDto(dto),user);
 
             //기존 재고의 감소/삭제
             minusOrRemove(oldStock,dto);
+
+            //히스토리 기록 - 기존 재고의 감소
+            StockHistory history = StockHistory.createStockHistory(oldStock,user,dto.getMoveQuantity(),StockTransactionType.IN,"기존 재고 감소.");
+            historyRepository.saveStockHistory(history);
         }else{
             //3-2.있다면 동일한 상품인가? - 하나만 확인하면 됨, 어차피 상품은 동일
             if(oldStock.getItem().getId().equals(newStockList.getFirst().getItem().getId())){
@@ -129,13 +174,24 @@ public class StockService {
                                 .findFirst()
                                         .orElse(null);
                 if(sameStatusStock != null){
+                    //같은 아이템이고 같은 상태의 재고가 있다면 변경 감지를 통한 재고 추가
                     sameStatusStock.addQuantity(dto.getMoveQuantity());
                     returnValue =  sameStatusStock.getId();
+
+                    //히스토리 기록 - 이동하는 곳의 재고 증가
+                    StockHistory history = StockHistory.createStockHistory(sameStatusStock,user,dto.getMoveQuantity(),StockTransactionType.MOVE,"이동하는 곳의 재고 증가.");
+                    historyRepository.saveStockHistory(history);
                 }else{
-                    returnValue = registerStock(new StockRegisterDto(dto));
+                    //같은 아이템이지만 다른 상태의 재고라면 새로운 재고 추가(
+                    returnValue = registerStockWithSecurity(new StockRegisterDto(dto),user);
+                    //히스토리 기록 - registerStockWithSecurity 안에 있음
                 }
                 //기존 재고 감소/삭제
                 minusOrRemove(oldStock,dto);
+
+                //히스토리 기록 - 기존 재고의 감소
+                StockHistory history = StockHistory.createStockHistory(oldStock,user,dto.getMoveQuantity(),StockTransactionType.OUT,"기존 재고 감소.");
+                historyRepository.saveStockHistory(history);
 
             }else{
                 //3-4.동일한 상품이 아니라면 재고 추가 x (한 로케이션에 하나의 상품만)
@@ -144,13 +200,15 @@ public class StockService {
             }
         }
         return  returnValue;
-        //4.히스토리 기록
     }
     //-----------------삭제-------------------
     @Transactional
-    public void deleteStock(Long id){
+    public void deleteStock(Long id,User user){
+        Stock  stock = findById(id);
         stockRepository.delete(id);
-        //히스토리 기록
+        //히스토리 기록 - 기존 재고의 삭제
+        StockHistory history = StockHistory.createStockHistory(stock,user,stock.getQuantity(),StockTransactionType.DELETE,"기존 재고 폐기.");
+        historyRepository.saveStockHistory(history);
     }
 
     //-----------------기타-------------------
@@ -176,5 +234,6 @@ public class StockService {
             oldStock.removeQuantity(dto.getMoveQuantity());
         }
     }
+
 
 }
