@@ -36,7 +36,7 @@
 
     <!-- 🔍 동적 검색 필터 폼 바 (조회 버튼 누르면 URL 파라미터를 들고 현재 페이지를 새로고침합니다) -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/histories/user}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/histories/user}" method="get" id="search-form" class="row g-3 align-items-center">
 
             <!-- 1. 액션 타입 선택 필터 -->
             <div class="col-md-2">
@@ -89,7 +89,7 @@
             </thead>
             <tbody>
             <!-- 💡 컨트롤러가 넘겨준 DTO 리스트(histories)를 반복문 돌립니다 -->
-            <tr th:each="h : ${histories}">
+            <tr th:each="h : ${page.getContent()}">
                 <td th:text="${h.id}">1</td>
                 <td>
                     <!-- 💡 DTO에서 꺼낸 텍스트형 필드들로 배지 스타일을 분기합니다 -->
@@ -112,11 +112,12 @@
             </tr>
 
             <!-- 💡 필터 조건으로 검색했을 때 일치하는 로그 데이터가 0건일 때 보여줄 방어벽 화면 -->
-            <tr th:if="${#lists.isEmpty(histories)}">
+            <tr th:if="${#lists.isEmpty(page.content)}">
                 <td colspan="6" class="text-muted py-4">조건에 부합하는 시스템 이력 로그가 존재하지 않습니다.</td>
             </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 

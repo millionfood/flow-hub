@@ -36,7 +36,7 @@
 
     <!-- 🔍 동적 검색 필터 폼 바 (대통합 HistorySearchCond 연동) -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/histories/stock}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/histories/stock}" method="get" id="search-form" class="row g-3 align-items-center">
             <!-- 하이든 파라미터로 현재 재고 이력 탭 타겟임을 서버에 명시 -->
             <input type="hidden" name="historyTarget" value="STOCK">
 
@@ -105,7 +105,7 @@
             </thead>
             <tbody>
             <!-- 💡 컨트롤러가 넘겨준 물류 이력 리스트 루프 실행 -->
-            <tr th:each="h : ${histories}">
+            <tr th:each="h : ${page.getContent()}">
                 <td th:text="${h.id}">124</td>
                 <td>
                     <!-- 물류 작업 타입에 따른 하이라이트 배지 분기 처리 -->
@@ -146,11 +146,12 @@
                 <td th:text="${h.createdDateStr}" class="text-secondary small">2026-05-24 15:16:48</td>
             </tr>
             <!-- 데이터 방어선 -->
-            <tr th:if="${#lists.isEmpty(histories)}">
+            <tr th:if="${#lists.isEmpty(page.getContent())}">
                 <td colspan="7" class="text-muted py-5 fs-6">현재 조건에 부합하는 물류 재고 변동 이력 로그가 존재하지 않습니다.</td>
             </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 

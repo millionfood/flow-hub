@@ -30,7 +30,7 @@
 
                 <!-- 2. 회원 관리 단독 메뉴 -->
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                    <a class="nav-link fw-bold text-light" th:href="@{/admin/users}">전체 회원 관리 (Admin)</a>
+                    <a class="nav-link fw-bold text-light" th:href="@{/admin/home}">관리자 페이지 (Admin)</a>
                 </li>
 
                 <!-- [B] 일반 유저 권한(ROLE_USER)을 가진 사람에게만 보이는 메뉴 -->
@@ -55,5 +55,44 @@
         </div>
     </div>
 </nav>
+<!--사용법 - 사용하는 페이지의 검색 form 의 id를 search-form로 해주면 된다.-->
+<div th:fragment="pagingBar(page)"
+     th:if="${page != null && !page.isEmpty()}" class="d-flex justify-content-center mt-4">
+    <nav>
+        <ul class="pagination pagination-sm">
 
+            <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
+                <button type="button" class="page-link" th:onclick="|movePage(${page.number-1})|">이전</button>
+            </li>
+
+            <li class="page-item" th:each="pageIdx : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${pageIdx == page.number} ? 'active'">
+                <button type="button" class="page-link" th:onclick="|movePage(${pageIdx})|" th:text="${pageIdx + 1}">1</button>
+            </li>
+
+            <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
+                <button type="button" class="page-link" th:onclick="|movePage(${page.number+1})|">다음</button>
+            </li>
+
+        </ul>
+    </nav>
+    <script>
+        function movePage(pageNo){
+            const searchForm = document.getElementById('search-form');
+
+            let pageInput = searchForm.querySelector('.page-input');
+            if(!pageInput){
+                pageInput = document.createElement('input');
+                pageInput.classList.add('page-input')
+                pageInput.type = 'hidden';
+                pageInput.name = 'page';
+                searchForm.appendChild(pageInput);
+            }
+
+            pageInput.value = pageNo;
+            searchForm.submit();
+        }
+
+    </script>
+</div>
 </html>
