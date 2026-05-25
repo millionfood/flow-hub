@@ -44,8 +44,8 @@
                 <select name="userType" class="form-select form-select-sm">
                     <option value="">전체 보기</option>
                     <!-- 💡 컨트롤러에서 넘어온 cond 객체의 값을 비교해서 선택 상태(selected)를 유지합니다 -->
-                    <option value="DISABLE" th:selected="${cond.userType == 'DISABLE'}">계정 정지</option>
-                    <option value="ENABLE" th:selected="${cond.userType == 'ENABLE'}">계정 활성화</option>
+                    <option value="DISABLE" th:selected="${cond.userType?.name() == 'DISABLE'}">계정 정지</option>
+                    <option value="ENABLE" th:selected="${cond.userType?.name() == 'ENABLE'}">계정 활성화</option>
                 </select>
             </div>
 
