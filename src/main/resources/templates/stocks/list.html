@@ -5,27 +5,81 @@
     <title>재고 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-<div class="container">
+<div class="container mt-5">
 
-    <div class="py-5 text-center">
+    <!-- 🎛️ 상단 물류 통합 대시보드 탭 -->
+    <div class="card p-2 mb-4 shadow-sm bg-white">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/warehouses/list}">🏢 사용가능 창고 조회</a></li>
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/location/list}">📍 로케이션(랙) 현황</a></li>
+            <li class="nav-item"><a class="nav-link text-dark fw-bold" th:href="@{/items/list}">📦 등록가능 상품 조회</a></li>
+            <li class="nav-item"><a class="nav-link active bg-dark" th:href="@{/stocks/list}">📜 재고 조회 및 등록</a></li>
+        </ul>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>📦 재고 현황 목록</h2>
     </div>
 
     <!-- 검색 필터 (선택 사항) -->
-    <div class="filter-section" style="margin-bottom: 20px;">
-        <form th:action="@{/stocks/list}" method="get" class="form-inline">
-            <input type="text" name="itemName" placeholder="상품/창고/로케이션 검색" class="form-control mb-3">
-            <button type="submit" class="btn btn-secondary">검색</button>
+    <div class="card shadow-sm bg-white p-3 mb-4">
+        <form th:action="@{/stocks/list}" method="get" id="search-form" class="row g-3 align-items-center">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">창고선택</label>
+                <select id="warehouse-select" class="form-control form-control-sm" th:field="${cond.warehouseId}">
+                    <option value="">창고를 선택하세요</option>
+                    <option class="form-control form-control-sm" th:each="warehouse:${warehouses}"
+                            th:value="${warehouse.id}"
+                            th:text="${warehouse.name}"
+                    ></option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-secondary">로케이션</label>
+                <select th:field="*{cond.locCode}" id="location-select" class="form-control form-control-sm">
+                    <option class="form-control form-control-sm" value="">창고 선택시 목록이 나타납니다.</option>
+                    <!--        <option th:each="loc : ${locations}"-->
+                    <!--                th:value="${loc.id}"-->
+                    <!--                th:text="${loc.locCode} + ' (' + ${loc.warehouseName} + ')'">-->
+                    <!--        </option>-->
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-secondary">관리구역 선택</label>
+                <select  class="form-control form-control-sm" th:field="${cond.locationZone}">
+                    <option value="">관리구역 선택</option>
+                    <option class="form-control form-control-sm" th:each="zone:${locationZones}"
+                            th:value="${zone.name}"
+                            th:text="${zone.description}"
+                    ></option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-secondary">상품상태 선택</label>
+                <select  class="form-control form-control-sm" th:field="${cond.stockStatus}">
+                    <option value="">창고를 선택하세요</option>
+                    <option class="form-control form-control-sm" th:each="status:${stockStatus}"
+                            th:value="${status.name}"
+                            th:text="${status.description}"
+                    ></option>
+                </select>
+            </div>
+
+            <div class="col-md-1 align-self-end">
+                <button type="submit" class="btn btn-dark btn-sm w-100 fw-bold">필터</button>
+            </div>
         </form>
     </div>
 
-    <div class="row">
-        <div class="col">
-            <button class="btn btn-success float-end"
-                    th:onclick="|location.href='@{/warehouses/new}'|" type="button">신규 재고 등록</button>
-        </div>
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a class="btn btn-secondary"
+                href="/user/home" type="button">이전</a>
+        <button class="btn btn-success float-end"
+                th:onclick="|location.href='@{/stocks/new}'|" type="button">신규 재고 등록</button>
     </div>
 
     <table class="table table-striped">
@@ -36,36 +90,36 @@
             <th>로케이션 코드</th>
             <th>상품명</th>
             <th>현재 수량</th>
+            <th>관리구역</th>
             <th>상태</th>
-            <th>최종 수정일</th>
             <th>관리</th>
         </tr>
         </thead>
         <tbody>
         <!-- 데이터가 없는 경우 -->
-        <tr th:if="${#lists.isEmpty(stocks)}">
-            <td colspan="7" style="text-align: center;">조회된 재고가 없습니다.</td>
+        <tr th:if="${#lists.isEmpty(page.getContent())}">
+            <td colspan="8" style="text-align: center;">조회된 재고가 없습니다.</td>
         </tr>
 
         <!-- 데이터가 있는 경우 반복문 -->
-        <tr th:each="stock, stat : ${stocks}">
+        <tr th:each="stock, stat : ${page.getContent()}">
             <td th:text="${stat.count}">1</td>
-            <td><span class="badge bg-info text-dark" th:text="${stock.warehouseName}">A창고</span></td>
+            <td><span class="fw-bold" th:text="${stock.warehouseName}">A창고</span></td>
             <td th:text="${stock.locationLocCode}">LOC-A-01</td>
             <td>
                 <span th:text="${stock.itemName}">상품명</span>
             </td>
             <td th:text="${#numbers.formatInteger(stock.quantity, 0, 'COMMA')}">1,000</td>
+            <td th:text="${stock.zone.name()}">1,000</td>
             <td>
                 <!-- 상태별 배지 색상 처리 -->
                 <span class="badge"
                       th:classappend="${stock.status.name() == 'AVAILABLE' ? 'bg-success' :
                                           (stock.status.name() == 'HOLD' ? 'bg-warning' : 'bg-danger')}"
-                      th:text="${stock.status}">
+                      th:text="${stock.status.description}">
                         AVAILABLE
                     </span>
             </td>
-            <td th:text="${#temporals.format(stock.lastModifiedDate, 'yyyy-MM-dd HH:mm')}">2026-05-10 14:00</td>
             <td>
                 <a th:href="@{/stocks/move/{id}(id=${stock.id})}" class="btn btn-sm btn-info">이동</a>
                 <a th:href="@{/stocks/edit/{id}(id=${stock.id})}" class="btn btn-sm btn-outline-secondary">수정</a>
@@ -73,8 +127,49 @@
         </tr>
         </tbody>
     </table>
-
+    <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
 </div>
+<script>
+    document.getElementById("warehouse-select").addEventListener('change',function(){
+        const warehouseId = this.value;
+        const locationSelect = document.getElementById("location-select");
+
+        //상품 선택이 해제된 경우 초기화
+        if(!warehouseId) {
+            locationSelect.innerHTML ='<option value="">--- 창고를 먼저 선택하세요 ---</option>';
+            return;
+        }
+        //로딩 중 표시할 화면
+        locationSelect.innerHTML = '<option value="">--- 로케이션을 불러오는중... ---</option>'
+
+        //서버 REST API 호출
+        fetch(`/stocks/api/locations-warehouse?warehouseId=${warehouseId}`)
+            .then(response =>{
+                if(!response.ok) throw new Error('네트워크 응답에 문제가 발생했습니다.')
+                return response.json();
+            })
+            .then(data => {
+                locationSelect.innerHTML = '<option value=""> 로케이션 선택 </option>';
+
+                if(data.length === 0){
+                    locationSelect.innerHTML = '<option value=""> 입고 가능한 로케이션이 없습니다. </option>';
+                    return;
+                }
+
+                data.forEach(loc => {
+                    const option = document.createElement('option');
+                    option.value = loc.id;
+                    option.text = `${loc.warehouseName}[${loc.locCode}]`;
+                    locationSelect.appendChild(option);
+                })
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                locationSelect.innerHTML = '<option value=""> 로케이션을 불러오지 못했습니다. </option>';
+            })
+
+    })
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
