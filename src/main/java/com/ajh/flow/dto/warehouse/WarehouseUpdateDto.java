@@ -10,18 +10,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WarehouseUpdateDto {
 
-    public WarehouseUpdateDto(String name, String address, String managerName, String tel){
+    public WarehouseUpdateDto(String name, String address){
         this.name = name;
         this.address = address;
-        this.managerName = managerName;
-        this.tel = tel;
     }
 
-    public WarehouseUpdateDto(Warehouse warehouse) {
-        this.name = warehouse.getName();
-        this.address = warehouse.getAddress();
-        this.managerName = warehouse.getManagerName();
-        this.tel = warehouse.getTel();
+    public WarehouseUpdateDto(WarehouseDetailDto dto) {
+        this.name = dto.getName();
+        this.address = dto.getAddress();
+        this.registerName = dto.getRegisterName();
+        this.registerTel = dto.getRegisterTel();
     }
 
     @NotBlank
@@ -29,8 +27,8 @@ public class WarehouseUpdateDto {
     @NotBlank
     private String address;
     @NotBlank
-    private String managerName;
+    private String registerName;
     @NotBlank
-    private String tel;
+    private String registerTel;
 
 }

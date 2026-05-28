@@ -27,28 +27,23 @@ public class Warehouse extends BaseEntity{
     @Column(length = 255)
     private String address;
 
-    @Column(length = 100)
-    private String managerName;
-
-    @Column(length = 20)
-    private String tel; //창고 연락처
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "register_id", nullable = false)
+    private User register;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UseYn useYn = UseYn.Y; // 사용 여부
 
     @Builder
-    public Warehouse(String name, String address, String tel, String managerName) {
+    public Warehouse(String name, String address, String tel, User register) {
         this.name = name;
         this.address = address;
-        this.tel = tel;
-        this.managerName = managerName;
+        this.register = register;
     }
 
     public void update(WarehouseUpdateDto dto){
         this.name = dto.getName();
         this.address = dto.getAddress();
-        this.managerName = dto.getManagerName();
-        this.tel = dto.getTel();
     }
 }

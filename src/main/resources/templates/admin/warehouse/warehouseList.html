@@ -22,16 +22,24 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>🏢 등록 창고 마스터 인벤토리</h4>
-        <a class="btn btn-primary btn-sm" th:href="@{/warehouses/new}">+ 새 창고 인프라 등록</a>
+        <a class="btn btn-primary btn-sm" th:href="@{/admin/warehouse/new}">+ 새 창고 등록</a>
     </div>
 
     <!-- 🔍 물류 창고 전용 동적 검색 필터 바 -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/management/warehouses}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/warehouses}" method="get" id="search-form" class="row g-3 align-items-center">
             <!-- 3. 창고 식별 정보 검색 -->
-            <div class="col-md-11">
+            <div class="col-md-5">
                 <label class="form-label small fw-bold text-secondary">창고명</label>
-                <input type="text" th:field="${cond.name}" name="warehouseSearch" class="form-control form-control-sm" placeholder="창고 이름 입력">
+                <input type="text" th:field="${cond.warehouseSearch}" name="warehouseSearch" class="form-control form-control-sm" placeholder="창고 이름 입력">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">관리자 이름</label>
+                <input type="text" th:field="${cond.adminName}" name="adminName" class="form-control form-control-sm" placeholder="관리자 이름 입력">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-secondary">관리자 연락처</label>
+                <input type="text" th:field="${cond.adminTel}" name="adminTel" class="form-control form-control-sm" placeholder="관리자 연락처 입력">
             </div>
 
             <div class="col-md-1 align-self-end">
@@ -52,18 +60,19 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="w : ${warehouses}">
+            <tr th:each="w : ${page.getContent()}">
                 <td th:text="${w.id}">1</td>
                 <td th:text="${w.name}">서울 제1중앙물류창고</td>
                 <td class="fw-bold text-primary" th:text="${w.address}">SEOUL</td>
-                <td><span class="badge bg-success active" th:text="${w.managerName}">안진혁</span></td>
-                <td><span class="badge bg-secondary active" th:text="${w.tel}">01038041915</span></td>
+                <td><span class="badge bg-success active" th:text="${w.registerName}">안진혁</span></td>
+                <td><span class="badge bg-secondary active" th:text="${w.registerTel}">01038041915</span></td>
             </tr>
-            <tr th:if="${#lists.isEmpty(warehouses)}">
+            <tr th:if="${#lists.isEmpty(page.content)}">
                 <td colspan="6" class="text-muted py-4">등록된 물류 창고 인프라가 없습니다.</td>
             </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

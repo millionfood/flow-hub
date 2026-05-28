@@ -4,11 +4,14 @@ import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.warehouse.WarehouseRegisterDto;
 import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
+import com.ajh.flow.dto.warehouse.WarehouseSearchCond;
 import com.ajh.flow.dto.warehouse.WarehouseUpdateDto;
 import com.ajh.flow.service.ItemService;
 import com.ajh.flow.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,25 +30,12 @@ public class WarehouseController {
 
 
     //-----------------등록-----------------
-    @GetMapping("/new")
-    public String createForm(Model model) {
-        model.addAttribute("warehouseForm",new WarehouseRegisterDto());
-        return "warehouse/new";
-    }
-    @PostMapping("/new")
-    public String create(@Valid WarehouseRegisterDto wareHouseRegisterDto, BindingResult result) {
-        if(result.hasErrors()) {
-            return "warehouse/new";
-        }
-        warehouseService.registerWarehouse(wareHouseRegisterDto);
-        return "redirect:/warehouses/list";
-    }
-
-
+    //adminController로 이동
     //-----------------조회-----------------
     @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("warehouses",warehouseService.findAll());
+    public String list(Model model, @PageableDefault(size = 10) Pageable pageable, WarehouseSearchCond cond) {
+        model.addAttribute("cond",cond);
+        model.addAttribute("page",warehouseService.findAllWithPaging(pageable, cond));
         return "warehouse/list";
     }
     @GetMapping("/detail/{warehouseId}")
@@ -61,8 +51,8 @@ public class WarehouseController {
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
         Warehouse warehouse = warehouseService.findById(id);
-        WarehouseUpdateDto warehouseUpdateDto = new WarehouseUpdateDto(warehouse);
-        model.addAttribute("warehouseForm",warehouseUpdateDto);
+//        WarehouseUpdateDto warehouseUpdateDto = new WarehouseUpdateDto(warehouse);
+//        model.addAttribute("warehouseForm",warehouseUpdateDto);
         model.addAttribute("warehouseId",id);
         model.addAttribute("useYn", warehouse.getUseYn());
 
