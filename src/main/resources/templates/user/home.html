@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowHub 관리자 메인 포털</title>
+    <title>FlowHub 일반유저 메인 포털</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
@@ -34,34 +34,21 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h1 class="fw-bold text-dark m-0">FlowHub 관리자 메인 포털</h1>
-            <p class="text-muted m-0 mt-1">물류 및 계정 관리를 위한 시스템 마스터 메인 포털입니다.</p>
+            <h1 class="fw-bold text-dark m-0">FlowHub 메인 포털</h1>
+            <p class="text-muted m-0 mt-1">편리한 물류 및 계정 관리를 지원합니다.</p>
         </div>
-        <span class="badge bg-primary p-2 fs-6">Admin</span>
+        <span class="badge bg-primary p-2 fs-6">User</span>
     </div>
 
     <div class="row g-4">
 
         <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/users'">
-                <div class="icon-box bg-primary bg-opacity-10 text-primary">
-                    <span class="material-symbols-outlined fs-2">group</span>
-                </div>
-                <h4 class="fw-bold card-title text-dark">유저 관리</h4>
-                <p class="text-muted card-text small">전체 회원 목록을 조회하고 계정의 권한 부여 및 상태(정지/활성화)를 제어합니다.</p>
-                <div class="text-primary fw-semibold mt-auto small d-flex align-items-center">
-                    바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/warehouses'">
+            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/warehouses/list'">
                 <div class="icon-box bg-success bg-opacity-10 text-success">
                     <span class="material-symbols-outlined fs-2">warehouse</span>
                 </div>
-                <h4 class="fw-bold card-title text-dark">창고 관리</h4>
-                <p class="text-muted card-text small">시스템에 현재 등록된 창고 현황을 확인하고 새로운 물류 창고를 추가 및 수정합니다.</p>
+                <h4 class="fw-bold card-title text-dark">창고 조회</h4>
+                <p class="text-muted card-text small">시스템에 현재 등록된 창고 현황을 확인합니다.</p>
                 <div class="text-success fw-semibold mt-auto small d-flex align-items-center">
                     바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
                 </div>
@@ -69,12 +56,12 @@
         </div>
 
         <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/locations'">
+            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/location/list'">
                 <div class="icon-box bg-warning bg-opacity-10 text-warning">
                     <span class="material-symbols-outlined fs-2">location_on</span>
                 </div>
-                <h4 class="fw-bold card-title text-dark">로케이션 관리</h4>
-                <p class="text-muted card-text small">창고 내부의 렉(Rack), 행(Row) 등 세부 구역을 설정하고 적재 위치 히스토리를 추적합니다.</p>
+                <h4 class="fw-bold card-title text-dark">로케이션 조회</h4>
+                <p class="text-muted card-text small">창고 내부의 적재 위치를 확인합니다.</p>
                 <div class="text-warning fw-semibold mt-auto small d-flex align-items-center">
                     바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
                 </div>
@@ -82,12 +69,12 @@
         </div>
 
         <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/items'">
+            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/items/list'">
                 <div class="icon-box bg-danger bg-opacity-10 text-danger">
                     <span class="material-symbols-outlined fs-2">inventory_2</span>
                 </div>
-                <h4 class="fw-bold card-title text-dark">상품 아이템 및 재고</h4>
-                <p class="text-muted card-text small">현재 등록되어 있는 전체 아이템을 조회합니다.</p>
+                <h4 class="fw-bold card-title text-dark">상품 조회</h4>
+                <p class="text-muted card-text small">현재 등록가능한 아이템을 조회합니다.</p>
                 <div class="text-danger fw-semibold mt-auto small d-flex align-items-center">
                     바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
                 </div>
@@ -95,12 +82,12 @@
         </div>
 
         <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/histories/user'">
+            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/stocks/list'">
                 <div class="icon-box bg-info bg-opacity-10 text-info">
                     <span class="material-symbols-outlined fs-2">history</span>
                 </div>
-                <h4 class="fw-bold card-title text-dark">시스템 히스토리</h4>
-                <p class="text-muted card-text small">관리자들이 수행한 행위 로그 및 유저 상태 변경 이력을 dynamic 필터로 꼼꼼하게 검색합니다.</p>
+                <h4 class="fw-bold card-title text-dark">재고 등록/수정/이동</h4>
+                <p class="text-muted card-text small">아이템을 조회하고 조작 합니다.</p>
                 <div class="text-info fw-semibold mt-auto small d-flex align-items-center">
                     바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
                 </div>
@@ -108,12 +95,12 @@
         </div>
 
         <div class="col-12 col-md-6 col-lg-3">
-            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/admin/detail'">
+            <div class="card h-100 dashboard-card p-4 shadow-sm" onclick="location.href='/user/detail'">
                 <div class="icon-box bg-dark bg-opacity-10 text-dark">
                     <span class="material-symbols-outlined fs-2">person</span>
                 </div>
                 <h4 class="fw-bold card-title text-dark">계정 정보</h4>
-                <p class="text-muted card-text small">관리자 계정의 정보를 확인하고 수정합니다.</p>
+                <p class="text-muted card-text small">사용자 계정의 정보를 확인하고 수정합니다.</p>
                 <div class="text-dark fw-semibold mt-auto small d-flex align-items-center">
                     바로가기 <span class="material-symbols-outlined ms-1 fs-6">arrow_forward</span>
                 </div>
