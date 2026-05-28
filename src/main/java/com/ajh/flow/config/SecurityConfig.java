@@ -3,6 +3,7 @@ package com.ajh.flow.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,5 +42,14 @@ public class SecurityConfig {
 
         return http.build();
 
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        // 크롬 개발자 도구의 무의미한 리소스 요청을 스프링이 완전히 무시하도록 설정
+        return (web) -> web.ignoring().requestMatchers(
+                "/.well-known/appspecific/com.chrome.devtools.json",
+                "/.well-known/**"
+        );
     }
 }
