@@ -8,9 +8,12 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container">
-    <h2>창고 등록</h2>
 
-    <form th:action="@{/warehouses/new}" th:object="${warehouseForm}" method="post">
+    <div class="py-5 text-center">
+        <h2>창고 등록</h2>
+    </div>
+
+    <form th:action="@{/admin/warehouse/new}" th:object="${warehouseForm}" method="post">
         <div class="mb-3">
             <label th:for="name">창고명</label>
             <input type="text" th:field="*{name}" class="form-control"
@@ -25,15 +28,20 @@
 
         <div class="mb-3">
             <label th:for="managerName">관리자 이름</label>
-            <input type="text" th:field="*{managerName}" class="form-control">
+            <input type="text" th:value="${user?.name}" class="form-control bg-light" readonly>
+            <input type="hidden" name="registerId" th:value="${user?.id}">
         </div>
 
-        <div class="mb-3">
-            <label th:for="tel">연락처</label>
-            <input type="text" th:field="*{tel}" class="form-control">
-        </div>
+        <hr class="my-4">
 
-        <button type="submit" class="btn btn-primary">등록</button>
+        <div class="row">
+            <div class="col">
+                <button type="button" onclick="history.back()" class="w-100 btn btn-secondary btn-lg">이전으로</button>
+            </div>
+            <div class="col">
+                <button type="submit" class="w-100 btn btn-primary btn-lg">등록</button>
+            </div>
+        </div>
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

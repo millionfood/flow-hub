@@ -13,26 +13,26 @@
         <h2>상품 등록</h2>
     </div>
 
-    <form th:action="@{/items/new}" th:object="${itemForm}" method="post">
+    <form th:action="@{/admin/item/new}" th:object="${itemForm}" method="post">
         <div class="mb-3">
             <label th:for="name">상품명</label>
             <input type="text" th:field="*{name}" class="form-control"
-                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" required>
             <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
         </div>
         <div class="mb-3">
             <label th:for="description">설명</label>
-            <input type="text" th:field="*{description}" class="form-control">
+            <input type="text" th:field="*{description}" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label th:for="price">가격</label>
-            <input type="number" th:field="*{price}" class="form-control">
+            <input type="number" th:field="*{price}" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label th:for="unit">단위</label>
-            <select th:field="*{unit}" class="form-select">
+            <select th:field="*{unit}" class="form-select" required>
                 <option value="">단위 선택</option>
                 <option th:each="unit : ${itemUnits}"
                         th:value="${unit}"
