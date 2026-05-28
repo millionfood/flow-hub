@@ -7,13 +7,17 @@ import com.ajh.flow.domain.User;
 import com.ajh.flow.domain.UserHistory;
 import com.ajh.flow.dto.user.UserDetailDto;
 import com.ajh.flow.dto.user.UserRegisterDto;
+import com.ajh.flow.dto.user.UserSearchCond;
 import com.ajh.flow.dto.user.UserUpdateDto;
 import com.ajh.flow.repository.HistoryRepository;
 import com.ajh.flow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +56,10 @@ public class UserService {
     public List<UserDetailDto> findUsers(){
         return userRepository.findUsers();
     }
+    public Page<UserDetailDto> findAllWithPaging(Pageable pageable, UserSearchCond cond){
+        return userRepository.findAllWithPaging(pageable,cond)
+                .map(UserDetailDto::new);
+    }
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
@@ -69,9 +77,14 @@ public class UserService {
     public User editUserInfo(Long id, UserUpdateDto dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        //비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(dto.getPassword());
-        dto.setEncodedPassword(encodedPassword);
+        //공백이 들어오면 StringUtils.hasText()가 false를 반환
+        if(StringUtils.hasText(dto.getPassword())){
+            //비밀번호 암호화
+            String encodedPassword = passwordEncoder.encode(dto.getPassword());
+            dto.setEncodedPassword(encodedPassword);
+        }else{
+            dto.setPassword(null);
+        }
         user.update(dto);
 
         return user;

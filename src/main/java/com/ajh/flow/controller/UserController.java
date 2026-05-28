@@ -3,7 +3,6 @@ package com.ajh.flow.controller;
 import com.ajh.flow.common.exception.DuplicateEntityException;
 import com.ajh.flow.domain.PrincipalDetails;
 import com.ajh.flow.domain.User;
-import com.ajh.flow.dto.user.UserDetailDto;
 import com.ajh.flow.dto.user.UserLoginDto;
 import com.ajh.flow.dto.user.UserRegisterDto;
 import com.ajh.flow.dto.user.UserUpdateDto;
@@ -32,6 +31,10 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/home")
+    public String home() {
+        return "user/home";
+    }
     //-----------------등록-----------------
     @GetMapping("/join")
     public String createForm(Model model) {
@@ -54,11 +57,6 @@ public class UserController {
         return "user/login";
     }
 
-    @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("userList",userService.findAll());
-        return "user/list";
-    }
     @GetMapping("/detail")
     public String detail(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         model.addAttribute("user",principalDetails.getUser());
@@ -72,7 +70,8 @@ public class UserController {
         return "user/edit";
     }
     @PostMapping("/edit")
-    public String edit(@AuthenticationPrincipal PrincipalDetails principalDetails, @Valid UserUpdateDto dto, BindingResult bindingResult, Model model) {
+    public String edit(@AuthenticationPrincipal PrincipalDetails principalDetails, @Valid UserUpdateDto dto,
+                       BindingResult bindingResult, Model model) {
         if(bindingResult.hasErrors()) {
             model.addAttribute("user",principalDetails.getUser());
             return "user/edit";

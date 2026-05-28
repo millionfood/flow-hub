@@ -4,6 +4,7 @@ import com.ajh.flow.common.constant.UserRole;
 import com.ajh.flow.domain.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,18 +13,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserRegisterDto {
     //테스트용
-    public UserRegisterDto(String email,String password, String name, UserRole role) {
+    public UserRegisterDto(String email,String password, String name, UserRole role, String tel) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.role = role;
-    }
-    //엔티티를 dto로 (화면 조회용)
-    public UserRegisterDto(User user) {
-        this.email = user.getEmail();
-        this.password = user.getPassword();
-        this.name = user.getName();
-        this.role = user.getRole();
+        this.tel = tel;
     }
 
     @NotNull(message = "email은 필수 입력 값입니다.")
@@ -33,6 +28,12 @@ public class UserRegisterDto {
     private String password;
     @NotNull(message = "name은 필수 입력 값입니다.")
     private String name;
+    @NotNull
+    @Pattern(
+            regexp = "^\\d{11}$",
+            message = "올바른 전화번호 11자리를 입력해 주세요"
+    )
+    private String tel;
     private UserRole role = UserRole.USER;
 
     public User toVo() {
@@ -41,6 +42,7 @@ public class UserRegisterDto {
                 .password(this.password)
                 .name(this.name)
                 .role(this.role)
+                .tel(this.tel)
                 .build();
     }
 

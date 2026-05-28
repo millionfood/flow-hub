@@ -22,10 +22,12 @@ public class UserDetailDto {
     }
     //엔티티를 dto로 (화면 조회용)
     public UserDetailDto(User user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.name = user.getName();
         this.role = user.getRole();
+        this.useYn = user.getUseYn();
     }
 
     private Long id;

@@ -22,17 +22,16 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2>👑 시스템 회원 관리 (관리자 전용)</h2>
-        <a th:href="@{/static}" class="btn btn-secondary btn-sm">메인으로</a>
     </div>
 
     <!-- 🔍 회원 관리 전용 동적 검색 필터 바 -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/users}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/users}" method="get" id="search-form" class="row g-3 align-items-center">
 
             <!-- 1. 계정 상태 필터 -->
             <div class="col-md-3">
                 <label class="form-label small fw-bold text-secondary">계정 상태</label>
-                <select th:field="${cond.useYn}" name="status" class="form-select form-select-sm">
+                <select th:field="${cond.useYn}" name="useYn" class="form-select form-select-sm">
                     <option value="">전체 상태</option>
                     <option value="Y">활성화 (ACTIVE)</option>
                     <option value="N">계정 정지 (BLOCK)</option>
@@ -65,20 +64,20 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="u : ${users}">
+            <tr th:each="u : ${page.getContent()}">
                 <td th:text="${u.id}">1</td>
                 <td th:text="${u.email}" class="text-start">user@test.com</td>
                 <td th:text="${u.name}">홍길동</td>
                 <td>
                         <span th:text="${u.role}"
-                              th:classappend="${u.role.name() == 'ADMIN' ? 'badge bg-danger' : 'badge bg-primary'}">
+                              th:classappend="${u.role?.name() == 'ADMIN' ? 'badge bg-danger' : 'badge bg-primary'}">
                             USER
                         </span>
                 </td>
                 <td>
                         <span th:id="|status-badge-${u.id}|"
-                              th:text="${u.useYn.name()}"
-                              th:classappend="${u.useYn.name() == 'Y' ? 'badge bg-success' : 'badge bg-secondary'}">
+                              th:text="${u.useYn?.name()}"
+                              th:classappend="${u.useYn?.name() == 'Y' ? 'badge bg-success' : 'badge bg-secondary'}">
                               Y
                         </span>
                 </td>
@@ -88,17 +87,21 @@
                         <button type="button"
                                 th:id="|status-btn-${u.id}|"
                                 class="status-toggle-btn"
-                                th:classappend="${u.useYn.name() == 'Y' ? 'btn btn-outline-danger' : 'btn btn-outline-success'}"
-                                th:text="${u.useYn.name() == 'Y' ? '정지' : '활성화'}"
+                                th:classappend="${u.useYn?.name() == 'Y' ? 'btn btn-outline-danger' : 'btn btn-outline-success'}"
+                                th:text="${u.useYn?.name() == 'Y' ? '정지' : '활성화'}"
                                 th:data-id="${u.id}"
-                                th:data-status="${u.useYn.name()}">
+                                th:data-status="${u.useYn?.name()}">
                             정지
                         </button>
                     </div>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(page.getContent())}">
+                <td colspan="6" class="text-muted py-4">현재 물류 시스템에 등록된 사용자가 없습니다.</td>
+            </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 <!-- 🚨 사유 입력용 부트스트랩 공통 모달창 -->

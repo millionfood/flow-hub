@@ -24,6 +24,9 @@ public class User extends BaseEntity{
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String tel;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -33,12 +36,13 @@ public class User extends BaseEntity{
     private UseYn useYn = UseYn.Y;
 
     @Builder
-    public User(Long id, String email, String password, String name, UserRole role) {
+    public User(Long id, String email, String password, String name, UserRole role, String tel) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.role = role;
+        this.tel = tel;
         this.useYn = UseYn.Y;
     }
 
@@ -53,6 +57,7 @@ public class User extends BaseEntity{
 
     public void update(UserUpdateDto dto){
         this.name = dto.getName();
+        this.tel = dto.getTel();
         if(dto.getPassword() != null && !dto.getPassword().isBlank()){
             this.password = dto.getPassword();
         }
