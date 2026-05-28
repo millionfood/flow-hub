@@ -1,16 +1,28 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.domain.Item;
-import com.ajh.flow.domain.Stock;
+import com.ajh.flow.dto.item.ItemDetailDto;
+import com.ajh.flow.dto.item.ItemSearchCond;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
+
+import static com.ajh.flow.domain.QItem.item;
+import static com.ajh.flow.domain.QStock.stock;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,6 +30,7 @@ import java.util.Optional;
 public class ItemRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     //-----------------저장-----------------
     //저장
@@ -27,6 +40,52 @@ public class ItemRepository {
 
 
     //-----------------조회-----------------
+    //전체조회
+    public List<Item> findAll() {
+        return em.createQuery("select i from Item i", Item.class).getResultList();
+
+    }
+    public Page<ItemDetailDto> findAllItemDetailDto(ItemSearchCond cond, Pageable pageable) {
+//        String jpql = "select new com.ajh.flow.dto.item.ItemDetailDto("+
+//                " i.id,i.name,i.barcode,i.description,i.price,i.unit,i.createdDate,"+
+//                " (select coalesce(sum(s.quantity),0) from Stock s where s.item = i))"+
+//                " from Item i"+
+//                " order by i.id desc";
+//        return em.createQuery(jpql, ItemDetailDto.class).getResultList();
+            List<ItemDetailDto> content = queryFactory
+                    .select(Projections.constructor(ItemDetailDto.class,
+                        item.id,
+                        item.name,
+                        item.barcode,
+                        item.description,
+                        item.price,
+                        item.unit,
+                        item.createdDate,
+                        stock.quantity.sum().coalesce(0L)
+                    ))
+                    .from(item)
+                    .leftJoin(stock).on(stock.item.eq(item))
+                    .where(
+                            itemNameLike(cond.getItemKeyword())
+                    )
+                    .groupBy(item.id)
+                    .orderBy(item.id.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+
+            Long totalCount = queryFactory
+                    .select(item.count())
+                    .from(item)
+                    .where(
+                        itemNameLike(cond.getItemKeyword())
+                    )
+                    .fetchOne();
+
+            long total = totalCount != null ? totalCount : 0L;
+
+            return new PageImpl<>(content, pageable, total);
+    }
     //단건조회 - 아이디 기준
     public Optional<Item> findById(Long id) {
         return Optional.ofNullable(em.find(Item.class, id));
@@ -56,10 +115,7 @@ public class ItemRepository {
                 .getSingleResult();
         return count > 0;
     }
-    //전체조회
-    public List<Item> findAll() {
-        return em.createQuery("select i from Item i", Item.class).getResultList();
-    }
+
 
 
     //-----------------수정-----------------
@@ -76,4 +132,12 @@ public class ItemRepository {
         em.remove(item);
     }
 
+    //-----------------기타-----------------
+    //QueryDsl 전용 메서드
+    private BooleanExpression itemNameLike(String itemName){
+        return StringUtils.hasText(itemName) ? item.name.like("%"+itemName+"%").or(item.barcode.like("%"+itemName+"%")) : null;
+    }
+    private BooleanExpression statusEq(StockStatus status){
+        return status != null ? stock.status.eq(status) : null;
+    }
 }

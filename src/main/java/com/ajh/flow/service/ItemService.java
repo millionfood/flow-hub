@@ -5,12 +5,15 @@ import com.ajh.flow.common.exception.InvalidBarcodeException;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.dto.item.ItemDetailDto;
 import com.ajh.flow.dto.item.ItemRegisterDto;
+import com.ajh.flow.dto.item.ItemSearchCond;
 import com.ajh.flow.dto.item.ItemUpdateDto;
 import com.ajh.flow.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +61,10 @@ public class ItemService {
         return itemRepository.findAll().stream()
                 .map(ItemDetailDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public Page<ItemDetailDto> findAllDetailDto(Pageable pageable, ItemSearchCond cond){
+        return itemRepository.findAllItemDetailDto(cond,pageable);
     }
 
     //상품 단건 조회 - 아이디

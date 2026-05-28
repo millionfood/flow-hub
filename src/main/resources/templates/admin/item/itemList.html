@@ -22,26 +22,15 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>📦 통합 상품 마스터 엔티티 및 현재고</h4>
-        <button class="btn btn-warning btn-sm text-dark fw-bold">🔄 실사 재고 조정 요청</button>
+        <a class="btn btn-warning btn-sm" th:href="@{/admin/item/new}">+ 새 아이템 등록</a>
     </div>
 
     <!-- 🔍 1. 상품 전용 동적 검색 필터 바 (ItemSearchCond 연동) -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/management/items}" method="get" class="row g-3 align-items-center">
-
-            <!-- 판매 상태 필터 -->
-            <div class="col-md-2">
-                <label class="form-label small fw-bold text-secondary">판매 및 노출 상태</label>
-                <select th:field="${cond.status}" name="status" class="form-select form-select-sm">
-                    <option value="">전체 상태</option>
-                    <option value="AVAILABLE">출고가능</option>
-                    <option value="HOLD">보류</option>
-                    <option value="DAMAGED">불량</option>
-                </select>
-            </div>
+        <form th:action="@{/admin/items}" method="get" id="search-form" class="row g-3 align-items-center">
 
             <!-- 명칭 및 바코드 통합 검색 -->
-            <div class="col-md-9">
+            <div class="col-md-11">
                 <label class="form-label small fw-bold text-secondary">대표 상품명 / SKU 바코드 식별자</label>
                 <input type="text" th:field="${cond.itemKeyword}" name="itemKeyword" class="form-control form-control-sm" placeholder="상품명 또는 13자리 바코드 번호를 입력하세요">
             </div>
@@ -65,7 +54,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="i : ${items}">
+            <tr th:each="i : ${page.getContent()}">
                 <td th:text="${i.id}">5001</td>
                 <td class="text-secondary font-monospace" th:text="${i.barcode}">8801043012921</td>
                 <td class="text-center fw-bold" th:text="${i.name}" style="width: 50%;">고급 저온압착 올리브유 500ml</td>
@@ -76,11 +65,12 @@
                     <a th:href="@{/admin/item/detail/{id}(id=${i.id})}" class="btn btn-sm btn-outline-secondary">상세정보</a>
                 </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(items)}">
+            <tr th:if="${#lists.isEmpty(page.getContent())}">
                 <td colspan="6" class="text-muted py-4">현재 물류 시스템에 등록된 상품 원장이 없습니다.</td>
             </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
