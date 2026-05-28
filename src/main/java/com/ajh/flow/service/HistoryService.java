@@ -5,6 +5,8 @@ import com.ajh.flow.dto.history.UserHistoryDetailDto;
 import com.ajh.flow.dto.history.HistorySearchCond;
 import com.ajh.flow.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +20,13 @@ public class HistoryService {
 
     private final HistoryRepository historyRepository;
 
-    public List<UserHistoryDetailDto> getUserHistoryList(HistorySearchCond cond){
-        return historyRepository.findAllUserHistory(cond).stream()
-                .map(UserHistoryDetailDto::new).collect(Collectors.toList());
+    public Page<UserHistoryDetailDto> getUserHistoryList(HistorySearchCond cond, Pageable pageable) {
+//        return historyRepository.findAllUserHistory(cond, pageable).stream()
+//                .map(UserHistoryDetailDto::new).collect(Collectors.toList());
+        return historyRepository.findAllUserHistory(cond, pageable).map(UserHistoryDetailDto::new);
     }
 
-    public List<StockHistoryDetailDto> getStockHistoryList(HistorySearchCond cond){
-        return historyRepository.findAllStockHistory(cond).stream()
-                .map(StockHistoryDetailDto::new).collect(Collectors.toList());
+    public Page<StockHistoryDetailDto> getStockHistoryList(HistorySearchCond cond, Pageable pageable){
+        return historyRepository.findAllStockHistory(cond, pageable).map(StockHistoryDetailDto::new);
     }
 }
