@@ -119,4 +119,9 @@ public class LocationService {
 
 
     //-----------------기타-------------------
+    //엑셀용 데이터 추출
+    public List<LocationDetailDto> getExcelDownloadList(LocationSearchCond cond){
+        return locationRepository.findExcelList(cond)
+                .stream().map(LocationDetailDto::new).collect(Collectors.toList());
+    }
 }

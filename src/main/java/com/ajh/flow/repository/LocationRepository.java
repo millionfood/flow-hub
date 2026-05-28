@@ -140,6 +140,18 @@ public class LocationRepository {
 
 
     //-----------------기타-----------------
+    //엑셀 다운로드 전용 리스트 조회
+    public List<Location> findExcelList(LocationSearchCond cond){
+        return queryFactory
+                .selectFrom(location)
+                .where(
+                        locCodeLike(cond.getLocCode()),
+                        warehouseIdEq(cond.getWarehouseId()),
+                        zoneEq(cond.getZone())
+                )
+                .orderBy(location.locCode.asc())
+                .fetch();
+    }
     //queryDsl 메서드
     private BooleanExpression locCodeLike(String locCode){
         return StringUtils.hasText(locCode) ? location.locCode.containsIgnoreCase(locCode.trim()) : null;
