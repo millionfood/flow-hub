@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass //상속을 위한 어노테이션
+@EntityListeners(AuditingEntityListener.class) // @CreatedDate,@LastModifiedDate를 사용하기 위함
 public class BaseEntity {
 
     @CreatedDate
