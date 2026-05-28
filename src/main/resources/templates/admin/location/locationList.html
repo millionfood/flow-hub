@@ -22,7 +22,12 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>📍 창고 내부 저장 로케이션 (세부 섹션 랙)</h4>
-        <a class="btn btn-success btn-sm" th:href="@{/admin/location/new}">+ 새 로케이션 등록</a>
+        <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-success btn-sm me-2" id="btn-excel-download">
+                📊 엑셀 다운로드
+            </button>
+            <a class="btn btn-success btn-sm" th:href="@{/admin/location/new}">+ 새 로케이션 등록</a>
+        </div>
     </div>
 
     <!-- 🔍 로케이션 세부 구역 전용 검색 필터 바 -->
@@ -100,6 +105,12 @@
         <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
+<script>
+    document.getElementById('btn-excel-download').addEventListener('click', function() {
+        const currentParams = window.location.search;
+        window.location.href = '/admin/location/excel' + currentParams;
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
