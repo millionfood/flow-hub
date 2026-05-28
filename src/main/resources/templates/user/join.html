@@ -32,11 +32,25 @@
             <p class="error-text" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
         </div>
 
+        <div class="mb-1">
+            <label for="password" class="form-label fw-bold">비밀번호 확인</label>
+            <!-- 서비스 단에서 빈 값 검사를 하므로, 바꾸고 싶을 때만 입력하도록 가이드합니다 -->
+            <input type="password" id="passwordCheck" name="passwordCheck" class="form-control" placeholder="비밀번호 확인">
+        </div>
+        <div id="password-feedback" class="small fw-bold mb-"></div>
+
         <!-- 이름 입력 -->
         <div class="mb-3">
             <label for="name" class="form-label">이름</label>
             <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="이름을 입력하세요" required>
             <p class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        </div>
+
+        <!-- 전화번호 입력 -->
+        <div class="mb-3">
+            <label for="name" class="form-label">전화번호</label>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g,'')" th:field="*{tel}" id="tel" class="form-control" placeholder="전화번호를 입력하세요" required>
+            <p class="error-text" th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}"></p>
         </div>
 
         <div class="d-grid gap-2">
@@ -48,8 +62,41 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         let isEmailValid = false;
-        const joinForm = document.getElementById('join-form');
         const emailInput = document.getElementById('email');
+        const joinForm = document.getElementById('join-form');
+
+        const passwordInput = document.getElementById('password');
+        const passwordCheckInput = document.getElementById('passwordCheck');
+        const feedback = document.getElementById('password-feedback');
+
+        function checkPasswordMatch() {
+            const password = passwordInput.value;
+            const passwordCheck = passwordCheckInput.value;
+
+            // 둘 다 입력 안 한 경우 (비밀번호 변경 의사가 없는 경우) -> 메시지 지우고 통과
+            if (!password && !passwordCheck) {
+                feedback.innerText = '';
+                feedback.className = '';
+                return true;
+            }
+
+            // 비밀번호가 서로 일치하는 경우
+            if (password === passwordCheck) {
+                feedback.innerText = '✓ 비밀번호가 일치합니다.';
+                feedback.className = 'small fw-bold mb-4 text-success';
+                return true;
+            }
+            // 일치하지 않는 경우
+            else {
+                feedback.innerText = '✗ 비밀번호가 일치하지 않습니다.';
+                feedback.className = 'small fw-bold mb-4 text-danger';
+                return false;
+            }
+        }
+
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        passwordCheckInput.addEventListener('input', checkPasswordMatch);
+
         emailInput.addEventListener('blur', function(){
             const email = this.value.trim();
             const feedback = document.getElementById('email-feedback');
@@ -98,12 +145,28 @@
                 });
         })
         joinForm.addEventListener('submit', function(e){
+            const telInput = document.getElementById('tel');
+            const telRegex = (/^\d{11}$/);
             if(!isEmailValid){
                 e.preventDefault();
                 alert('이메일을 다시 확인해 주세요')
                 emailInput.focus();
+                return;
+            }
+            if(!telRegex.test(telInput.value)) {
+                e.preventDefault();
+                alert("올바른 전화번호 11자리를 입력해 주세요");
+                telInput.focus();
+                return;
+            }
+            if (!checkPasswordMatch()) {
+                e.preventDefault(); //
+                alert('변경할 새 비밀번호가 서로 일치하지 않습니다. 다시 확인해 주세요.');
+                passwordCheckInput.focus(); // 비밀번호 확인 칸으로 포커스 강제 이동
             }
         })
+
+
     })
 
 </script>
