@@ -2,7 +2,6 @@ package com.ajh.flow.dto.location;
 
 import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.domain.Location;
-import com.ajh.flow.domain.Warehouse;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

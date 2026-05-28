@@ -8,7 +8,6 @@ import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.User;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.repository.ItemRepository;
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

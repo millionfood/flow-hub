@@ -1,6 +1,5 @@
 package com.ajh.flow.dto.location;
 
-import com.ajh.flow.common.constant.LocationZone;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

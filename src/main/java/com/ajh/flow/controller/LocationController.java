@@ -1,23 +1,19 @@
 package com.ajh.flow.controller;
 
 import com.ajh.flow.common.constant.LocationZone;
-import com.ajh.flow.common.constant.UseYn;
-import com.ajh.flow.domain.Location;
-import com.ajh.flow.dto.location.LocationDetailDto;
-import com.ajh.flow.dto.location.LocationRegisterDto;
 import com.ajh.flow.dto.location.LocationSearchCond;
-import com.ajh.flow.dto.location.LocationUpdateDto;
 import com.ajh.flow.service.LocationService;
 import com.ajh.flow.service.WarehouseService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor

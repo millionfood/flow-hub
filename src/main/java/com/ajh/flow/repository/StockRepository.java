@@ -2,7 +2,6 @@ package com.ajh.flow.repository;
 
 import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.StockStatus;
-import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Stock;
 import com.ajh.flow.dto.item.ItemLocationDetailDto;
 import com.ajh.flow.dto.item.ItemLocationSearchCond;

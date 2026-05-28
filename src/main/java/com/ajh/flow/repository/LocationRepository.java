@@ -1,13 +1,9 @@
 package com.ajh.flow.repository;
 
 import com.ajh.flow.common.constant.LocationZone;
-import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
-import com.ajh.flow.dto.item.ItemDetailDto;
-import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationSearchCond;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

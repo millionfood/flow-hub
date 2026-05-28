@@ -1,6 +1,5 @@
 package com.ajh.flow.repository;
 
-import com.ajh.flow.domain.QUser;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
 import com.ajh.flow.dto.warehouse.WarehouseSearchCond;

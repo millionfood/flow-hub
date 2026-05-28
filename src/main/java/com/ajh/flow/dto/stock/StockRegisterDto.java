@@ -1,8 +1,6 @@
 package com.ajh.flow.dto.stock;
 
 import com.ajh.flow.common.constant.StockStatus;
-import com.ajh.flow.domain.Stock;
-import com.ajh.flow.domain.Warehouse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

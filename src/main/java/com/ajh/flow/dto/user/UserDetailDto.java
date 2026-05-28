@@ -3,7 +3,6 @@ package com.ajh.flow.dto.user;
 import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.constant.UserRole;
 import com.ajh.flow.domain.User;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

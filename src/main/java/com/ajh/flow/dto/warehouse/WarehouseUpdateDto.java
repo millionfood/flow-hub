@@ -1,6 +1,5 @@
 package com.ajh.flow.dto.warehouse;
 
-import com.ajh.flow.domain.Warehouse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

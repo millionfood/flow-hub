@@ -3,7 +3,6 @@ package com.ajh.flow.controller;
 import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.dto.item.ItemDetailDto;
-import com.ajh.flow.dto.item.ItemRegisterDto;
 import com.ajh.flow.dto.item.ItemSearchCond;
 import com.ajh.flow.dto.item.ItemUpdateDto;
 import com.ajh.flow.service.ItemService;

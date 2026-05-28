@@ -1,11 +1,9 @@
 package com.ajh.flow.dto.history;
 
-import com.ajh.flow.common.constant.StockTransactionType;
 import com.ajh.flow.domain.StockHistory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.format.DateTimeFormatter;
 
