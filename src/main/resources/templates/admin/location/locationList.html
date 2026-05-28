@@ -22,12 +22,12 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>📍 창고 내부 저장 로케이션 (세부 섹션 랙)</h4>
-        <button class="btn btn-outline-secondary btn-sm">구역 도면 배치 수정</button>
+        <a class="btn btn-success btn-sm" th:href="@{/admin/location/new}">+ 새 로케이션 등록</a>
     </div>
 
     <!-- 🔍 로케이션 세부 구역 전용 검색 필터 바 -->
     <div class="card shadow-sm bg-white p-3 mb-4">
-        <form th:action="@{/admin/management/locations}" method="get" class="row g-3 align-items-center">
+        <form th:action="@{/admin/locations}" method="get" id="search-form" class="row g-3 align-items-center">
 
             <!-- 1. 소속 창고 타겟 필터 (특정 창고의 내부만 파고들 때 핵심) -->
             <div class="col-md-3">
@@ -35,7 +35,7 @@
                 <select th:field="${cond.warehouseId}" name="warehouseId" class="form-select form-select-sm">
                     <option value="">전체 창고 인프라 보기</option>
                     <!-- 백엔드에서 창고 리스트를 함께 넘겨주어 동적으로 뿌려주면 가장 좋습니다 -->
-                    <option th:each="wh : ${warehouseList}" th:value="${wh.id}" th:text="${wh.name}">서울 제1창고</option>
+                    <option th:each="wh : ${warehouseList}" th:value="${wh.id}" th:text="${wh.name}" th:selected="${cond.warehouseId == wh.id}">서울 제1창고</option>
                 </select>
             </div>
 
@@ -43,9 +43,9 @@
             <div class="col-md-3">
                 <label class="form-label small fw-bold text-secondary">배정 존(Zone) 검색</label>
                 <select th:field="${cond.zone}" name="warehouseId" class="form-select form-select-sm">
-                    <option value="">저장 구역 필터링</option>
+                    <option value="">전체 구역 보기</option>
                     <!-- 백엔드에서 창고 리스트를 함께 넘겨주어 동적으로 뿌려주면 가장 좋습니다 -->
-                    <option th:each="z : ${zoneList}" th:value="${z.name}" th:text="${z.description}">냉장</option>
+                    <option th:each="z : ${zoneList}" th:value="${z.name}" th:text="${z.description}" th:selected="${cond.zone?.name() == z.name}">냉장</option>
                 </select>
             </div>
 
@@ -69,20 +69,35 @@
                 <th>소속 창고</th>
                 <th>배정 존(Zone)</th>
                 <th>Loc_code</th>
+                <th>사용 여부</th>
+                <th>관리</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="l : ${locations}">
-                <td th:text="${l.id}">101</td>
-                <td th:text="${l.warehouseName}">서울 제1중앙물류창고</td>
-                <td class="fw-bold text-success" th:text="${l.zone}">Cold</td>
-                <td th:text="${l.locCode}">4행 12열</td>
+            <tr th:each="loc, loop : ${page.getContent()}">
+                <td th:text="${loop.count}">101</td>
+                <td th:text="${loc.warehouseName}">서울 제1중앙물류창고</td>
+                <td>
+                    <span th:if="${loc.zone.name() == 'COLD'}" class="badge bg-info-subtle text-info fw-bold">냉동구역</span>
+                    <span th:if="${loc.zone.name() == 'FRIDGE'}" class="badge bg-success-subtle text-success fw-bold">냉장구역</span>
+                    <span th:if="${loc.zone.name() == 'ROOM'}" class="badge bg-secondary-subtle text-secondary fw-bold">상온구역</span>
+                    <span th:if="${loc.zone.name() == 'HAZARD'}" class="badge bg-danger-subtle text-danger fw-bold">위험구역</span>
+                </td>
+                <td th:text="${loc.locCode}">4행 12열</td>
+                <td>
+                    <span th:if="${loc.useYn.name() == 'Y'}" class="text-success">사용중</span>
+                    <span th:if="${loc.useYn.name() == 'N'}" class="text-danger">미사용</span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/location/detail/{id}(id=${loc.id})}" class="btn btn-sm btn-outline-secondary">상세정보</a>
+                </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(locations)}">
+            <tr th:if="${#lists.isEmpty(page.content)}">
                 <td colspan="5" class="text-muted py-4">조회 가능한 로케이션 구역이 존재하지 않습니다.</td>
             </tr>
             </tbody>
         </table>
+        <div th:replace="~{fragments/navbar :: pagingBar(${page})}"></div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

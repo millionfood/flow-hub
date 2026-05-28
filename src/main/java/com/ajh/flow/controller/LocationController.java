@@ -5,12 +5,15 @@ import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationRegisterDto;
+import com.ajh.flow.dto.location.LocationSearchCond;
 import com.ajh.flow.dto.location.LocationUpdateDto;
 import com.ajh.flow.service.LocationService;
 import com.ajh.flow.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,44 +30,16 @@ public class LocationController {
 
 
     //-----------------등록-----------------
-    @GetMapping("/new")
-    public String createForm(Model model) {
-        model.addAttribute("locationForm", new LocationRegisterDto());
-        model.addAttribute("locationZone", LocationZone.values());
-        model.addAttribute("useYn", UseYn.values());
-        model.addAttribute("warehouseList", warehouseService.findAll());
-
-        return "location/new";
-    }
-
-    @PostMapping("/new")
-    public String create(@Valid @ModelAttribute("locationForm") LocationRegisterDto locationRegisterDto, BindingResult result, Model model) {
-        if(result.hasErrors()){
-            model.addAttribute("locationZone", LocationZone.values());
-            model.addAttribute("useYn", UseYn.values());
-            model.addAttribute("warehouseList", warehouseService.findAll());
-            return "location/new";
-        }
-        locationService.registerLocation(locationRegisterDto);
-        return  "redirect:/location/list";
-    }
-
-
+    //adminController로 이전
     //-----------------조회-----------------
     @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("locationList", locationService.findAll());
+    public String list(@PageableDefault(size = 10) Pageable pageable, LocationSearchCond cond, Model model) {
+        model.addAttribute("cond", cond);
+        model.addAttribute("zoneList",LocationZone.values());
+        model.addAttribute("warehouseList", warehouseService.findAll());
+        model.addAttribute("page", locationService.findAllWidthPaging(pageable, cond));
         return  "location/list";
     }
-    @GetMapping("/detail/{id}")
-    public String detail(Model model, @PathVariable Long id){
-        Location location = locationService.findById(id);
-        LocationDetailDto dto = new LocationDetailDto(location);
-        model.addAttribute("location", dto);
-
-        return "location/detail";
-    }
-
 
     //-----------------수정-----------------
     //정보 수정은 없음 - 재고가 있는 상태에서 수정할수 없기때문
