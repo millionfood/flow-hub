@@ -1,21 +1,38 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Stock;
+import com.ajh.flow.dto.item.ItemLocationDetailDto;
+import com.ajh.flow.dto.item.ItemLocationSearchCond;
 import com.ajh.flow.dto.stock.StockDetailDto;
+import com.ajh.flow.dto.stock.StockSearchCond;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.ajh.flow.domain.QItem.item;
+import static com.ajh.flow.domain.QLocation.location;
+import static com.ajh.flow.domain.QStock.stock;
+import static com.ajh.flow.domain.QWarehouse.warehouse;
 
 @Repository
 @RequiredArgsConstructor
 public class StockRepository {
 
     private final EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     //-----------------등록-----------------
     public void save(Stock stock) {
@@ -26,13 +43,124 @@ public class StockRepository {
     //전체 조회
     public List<StockDetailDto> findAll() {
         String jpql = "select new com.ajh.flow.dto.stock.StockDetailDto("+
-                "s.id,w.name,l.id,l.locCode,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
+                "s.id,w.name,l.id,l.locCode,l.zone,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
                 "from Stock s "+
                 "join s.location l "+
                 "join l.warehouse w "+
                 "join s.item i "+
                 "where s.useYn = 'Y'";
         return em.createQuery(jpql, StockDetailDto.class).getResultList();
+    }
+    public Page<StockDetailDto> findAllDetailWithPaging(Pageable pageable,StockSearchCond cond) {
+        List<StockDetailDto> content = queryFactory
+                .select(Projections.constructor(StockDetailDto.class,
+                        stock.id,
+                        warehouse.name,
+                        location.id,
+                        location.locCode,
+                        location.zone,
+                        item.id,
+                        item.name,
+                        stock.quantity,
+                        stock.lastModifiedDate,
+                        stock.status,
+                        stock.useYn))
+                .from(stock)
+                .join(stock.item,item)
+                .join(stock.location, location)
+                .join(stock.location.warehouse,warehouse)
+                .where(
+                        warehouseIdEq(cond.getWarehouseId()),
+                        locCodeLike(cond.getLocCode()),
+                        locationZoneEq(cond.getLocationZone()),
+                        stockStatusEq(cond.getStockStatus())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        Long totalCount = queryFactory
+                .select(stock.count())
+                .from(stock)
+                .join(stock.item,item)
+                .join(stock.location, location)
+                .join(stock.location.warehouse,warehouse)
+                .where(
+                        warehouseIdEq(cond.getWarehouseId()),
+                        locCodeLike(cond.getLocCode()),
+                        locationZoneEq(cond.getLocationZone()),
+                        stockStatusEq(cond.getStockStatus())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchOne();
+
+        long total = totalCount != null ? totalCount : 0L;
+
+        return new PageImpl<>(content, pageable, total);
+    }
+    public Page<ItemLocationDetailDto> findAllWithPaging(Long itemId, Pageable pageable, ItemLocationSearchCond cond){
+        List<ItemLocationDetailDto> content = queryFactory
+                .select(Projections.constructor(ItemLocationDetailDto.class,
+                        warehouse.id,
+                        warehouse.name,
+                        location.id,
+                        location.zone,
+                        location.locCode,
+                        item.id,
+                        item.name,
+                        item.barcode,
+                        stock.status,
+                        stock.quantity.sum()
+                        ))
+                .from(stock)
+                .join(stock.item,item)
+                .join(stock.location,location)
+                .join(location.warehouse,warehouse)
+                .where(
+                        stock.item.id.eq(itemId),
+                        warehouseIdEq(cond.getWarehouseId()),
+                        locCodeLike(cond.getLocCode()),
+                        stockStatusEq(cond.getStockStatus()),
+                        locationZoneEq(cond.getLocationZone())
+                )
+                .groupBy(
+                        warehouse.id,
+                        warehouse.name,
+                        location.id,
+                        location.zone,
+                        location.locCode,
+                        item.id,
+                        item.name,
+                        item.barcode,
+                        stock.status
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(location.id.stringValue()
+                        .concat("_")
+                        .concat(item.id.stringValue())
+                        .concat("_")
+                        .concat(stock.status.stringValue())
+                        .countDistinct())
+                .from(stock)
+                .join(stock.item,item)
+                .join(stock.location, location)
+                .join(location.warehouse, warehouse)
+                .where(
+                        warehouseIdEq(cond.getWarehouseId()),
+                        locCodeLike(cond.getLocCode()),
+                        stockStatusEq(cond.getStockStatus()),
+                        locationZoneEq(cond.getLocationZone())
+                )
+                .fetchOne();
+
+        long total = totalCount != null ? totalCount : 0L;
+
+        return new PageImpl<>(content, pageable, total);
+
     }
     //단건 조회 - 엔티티
     public Optional<Stock> findById(Long id) {
@@ -101,5 +229,35 @@ public class StockRepository {
                 .getResultList().stream().findFirst();
 
 
+    }
+    //queryDsl 메서드
+    // 1. 특정 창고 필터 (Long 일치 확인)
+    private BooleanExpression warehouseIdEq(Long warehouseId) {
+        return warehouseId != null ? warehouse.id.eq(warehouseId) : null;
+    }
+
+    // 2. 세부 로케이션 코드 필터 (포함 검색)
+    private BooleanExpression locCodeLike(String locCode) {
+        return StringUtils.hasText(locCode) ? location.locCode.containsIgnoreCase(locCode.trim()) : null;
+    }
+
+    // 3. 상품 재고 상태 필터 (Enum 일치 확인)
+    private BooleanExpression stockStatusEq(StockStatus stockStatus) {
+        return stockStatus != null ? stock.status.eq(stockStatus) : null;
+    }
+
+    // 4. 상품 Zone 필터 (Enum 일치 확인)
+    private BooleanExpression locationZoneEq(LocationZone locationZone) {
+        return locationZone != null ? location.zone.eq(locationZone) : null;
+    }
+
+    // 5. ⭐ 상품명 OR 바코드 통합 검색 필터 (가장 중요)
+    private BooleanExpression stockSearchLike(String stockSearch) {
+        if (!StringUtils.hasText(stockSearch)) {
+            return null;
+        }
+        String likeKeyword = "%" + stockSearch + "%";
+        return item.name.like(likeKeyword)
+                .or(item.barcode.like(likeKeyword));
     }
 }

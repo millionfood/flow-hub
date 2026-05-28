@@ -6,16 +6,17 @@ import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InsufficientStockException;
 import com.ajh.flow.common.exception.InvalidStockException;
 import com.ajh.flow.domain.*;
-import com.ajh.flow.dto.stock.StockDetailDto;
-import com.ajh.flow.dto.stock.StockMoveDto;
-import com.ajh.flow.dto.stock.StockRegisterDto;
-import com.ajh.flow.dto.stock.StockUpdateDto;
+import com.ajh.flow.dto.item.ItemLocationDetailDto;
+import com.ajh.flow.dto.item.ItemLocationSearchCond;
+import com.ajh.flow.dto.stock.*;
 import com.ajh.flow.repository.HistoryRepository;
 import com.ajh.flow.repository.ItemRepository;
 import com.ajh.flow.repository.LocationRepository;
 import com.ajh.flow.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,6 +111,12 @@ public class StockService {
     //전체 조회
     public List<StockDetailDto> findAll(){
         return stockRepository.findAll();
+    }
+    public Page<ItemLocationDetailDto> findItemWidthPaging(Long itemId, Pageable pageable, ItemLocationSearchCond cond){
+        return stockRepository.findAllWithPaging(itemId,pageable,cond);
+    }
+    public Page<StockDetailDto> findAllDetailWithPaging(Pageable pageable, StockSearchCond cond){
+        return stockRepository.findAllDetailWithPaging(pageable,cond);
     }
     //단건 조회 - 엔티티
     public Stock findById(Long id){

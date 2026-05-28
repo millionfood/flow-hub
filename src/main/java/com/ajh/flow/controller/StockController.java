@@ -1,22 +1,24 @@
 package com.ajh.flow.controller;
 
+import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.PrincipalDetails;
 import com.ajh.flow.domain.Stock;
 import com.ajh.flow.dto.location.LocationDetailDto;
-import com.ajh.flow.dto.stock.StockDetailDto;
-import com.ajh.flow.dto.stock.StockMoveDto;
-import com.ajh.flow.dto.stock.StockRegisterDto;
-import com.ajh.flow.dto.stock.StockUpdateDto;
+import com.ajh.flow.dto.location.LocationSearchCond;
+import com.ajh.flow.dto.stock.*;
 import com.ajh.flow.service.ItemService;
 import com.ajh.flow.service.LocationService;
 import com.ajh.flow.service.StockService;
+import com.ajh.flow.service.WarehouseService;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.Banner;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -34,6 +36,7 @@ public class StockController {
 
     private final StockService stockService;
     private final LocationService locationService;
+    private final WarehouseService warehouseService;
     private final ItemService itemService;
 
 
@@ -42,6 +45,7 @@ public class StockController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("stock", new StockRegisterDto());
+        model.addAttribute("warehouses",warehouseService.findAll());
         model.addAttribute("items", itemService.findAll());
         model.addAttribute("locations", locationService.findAll());
         model.addAttribute("stockStatus", StockStatus.values());
@@ -58,8 +62,12 @@ public class StockController {
 
     //-----------------조회-----------------
     @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("stocks",stockService.findAll());
+    public String list(@PageableDefault Pageable pageable, StockSearchCond cond ,Model model) {
+        model.addAttribute("warehouses",warehouseService.findAll());
+        model.addAttribute("stockStatus", StockStatus.values());
+        model.addAttribute("locationZones", LocationZone.values());
+        model.addAttribute("cond", cond);
+        model.addAttribute("page",stockService.findAllDetailWithPaging(pageable,cond));
 
         return "stocks/list";
     }
@@ -113,13 +121,18 @@ public class StockController {
         return "redirect:/stocks/list";
     }
 
-    //-----------------삭제-----------------
+    //-----------------기타-----------------
     @ResponseBody
-    @GetMapping("/api/locations")
-    public List<LocationDetailDto> getInboundAbleLocations(@RequestParam("itemId") Long itemId) {
-       Item item = itemService.findById(itemId);
-       return locationService.findInboundAbleALlLocation(item);
+    @GetMapping("/api/locations-itemAndWarehouse")
+    public List<LocationDetailDto> getInboundAbleLocationsByStock(@RequestParam("itemId") Long itemId, @RequestParam("warehouseId") Long warehouseId) {
+       return locationService.findInboundAbleALlLocationByItem(itemId,warehouseId);
     }
+    @ResponseBody
+    @GetMapping("/api/locations-warehouse")
+    public List<LocationDetailDto> getInboundAbleLocationsByWarehouse(@RequestParam("warehouseId") Long warehouseId) {
+        return locationService.findInboundAbleALlLocationByWareHouse(warehouseId);
+    }
+
 
 
 

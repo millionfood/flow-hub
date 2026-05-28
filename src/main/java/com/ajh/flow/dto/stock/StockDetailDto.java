@@ -1,5 +1,6 @@
 package com.ajh.flow.dto.stock;
 
+import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.common.constant.UseYn;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ public class StockDetailDto {
     private String warehouseName;
     private Long locationId;
     private String locationLocCode;
+    private LocationZone zone;
     private Long itemId;
     private String itemName;
     private Long quantity;
