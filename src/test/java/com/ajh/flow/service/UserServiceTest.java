@@ -3,12 +3,9 @@ package com.ajh.flow.service;
 import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.constant.UserRole;
 import com.ajh.flow.common.exception.DuplicateEntityException;
-import com.ajh.flow.domain.User;
 import com.ajh.flow.dto.user.UserRegisterDto;
 import com.ajh.flow.dto.user.UserUpdateDto;
 import jakarta.persistence.EntityManager;
-import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +28,7 @@ class UserServiceTest {
     Long userId;
     @BeforeEach
     void setUp() {
-        userId =  userService.registerUser(new UserRegisterDto("millionfood@naver.com","12312312312","안진혁", UserRole.USER));
+        userId =  userService.registerUser(new UserRegisterDto("millionfood@naver.com","12312312312","안진혁", UserRole.USER,"01038041915"));
         em.flush();
         em.clear();
     }
@@ -52,7 +49,7 @@ class UserServiceTest {
         //Given
         //When
         //Then
-        UserRegisterDto newDto = new UserRegisterDto("millionfood@naver.com","1111","안태웅", UserRole.USER);
+        UserRegisterDto newDto = new UserRegisterDto("millionfood@naver.com","1111","안태웅", UserRole.USER,"01038041915");
         assertThrows(DuplicateEntityException.class,()->userService.registerUser(newDto));
 ;    }
     @Test
@@ -60,7 +57,7 @@ class UserServiceTest {
     public void editProfile() throws Exception{
         //Given
         //When
-        UserUpdateDto updateDto = new UserUpdateDto("안태웅","2222");
+        UserUpdateDto updateDto = new UserUpdateDto("안태웅","01038041915","2222");
         userService.editUserInfo(userId,updateDto);
         em.flush();
         em.clear();
