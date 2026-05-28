@@ -18,6 +18,7 @@ import com.ajh.flow.dto.user.UserSearchCond;
 import com.ajh.flow.dto.warehouse.WarehouseRegisterDto;
 import com.ajh.flow.dto.warehouse.WarehouseSearchCond;
 import com.ajh.flow.service.*;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -176,6 +181,34 @@ public class AdminController {
         model.addAttribute("location", dto);
 
         return "admin/location/detail";
+    }
+    @GetMapping("/location/excel")
+    public void downloadLocationExcel(LocationSearchCond cond, HttpServletResponse response) throws IOException {
+        List<LocationDetailDto> locations = locationService.getExcelDownloadList(cond);
+
+
+        String fileName = URLEncoder.encode("창고_로케이션_목록", StandardCharsets.UTF_8);
+        response.setContentType("text/scv; charset=MS949");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".csv");
+
+        PrintWriter writer = response.getWriter();
+
+        writer.println("순번,창고명,구역(Zone),로케이션 코드,사용가능 여부");
+
+        int index = 1;
+        for (LocationDetailDto loc : locations) {
+            writer.println(String.format("%d,%s,%s,%s,%s,",
+                    index++,
+                    loc.getWarehouseName(),
+                    loc.getZone().name(),
+                    loc.getLocCode(),
+                    loc.getUseYn().name()
+                    ));
+        }
+
+        writer.flush();
+        writer.close();
+
     }
 
     //-----------------상품 및 재고 통합-----------------
