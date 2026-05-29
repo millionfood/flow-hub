@@ -18,8 +18,6 @@ public class HistoryService {
     private final HistoryRepository historyRepository;
 
     public Page<UserHistoryDetailDto> getUserHistoryList(HistorySearchCond cond, Pageable pageable) {
-//        return historyRepository.findAllUserHistory(cond, pageable).stream()
-//                .map(UserHistoryDetailDto::new).collect(Collectors.toList());
         return historyRepository.findAllUserHistory(cond, pageable).map(UserHistoryDetailDto::new);
     }
 

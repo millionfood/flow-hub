@@ -40,7 +40,7 @@ public class HistoryRepository {
             jpql += " and (a.name like concat('%', :adminSearch, '%') or a.email like concat('%', :adminSearch, '%'))";
         }
         if(StringUtils.hasText(cond.getTargetSearch())){
-            jpql += " and (t.name like concat('%', :targetSearch, '%')) or t.email like concat('%', :targetSearch, '%')";
+            jpql += " and (t.name like concat('%', :targetSearch, '%') or t.email like concat('%', :targetSearch, '%'))";
         }
         if(StringUtils.hasText(cond.getRemarkKeyword())){
             jpql += " and h.remark like concat('%', :remarkKeyword, '%')";
@@ -73,7 +73,7 @@ public class HistoryRepository {
                 " join h.admin a join h.targetUser t where 1=1";
         if(cond.getUserType() != null) countJpql += " and h.type = :type";
         if(StringUtils.hasText(cond.getAdminSearch())) countJpql += " and (a.name like concat('%', :adminSearch, '%') or a.email like concat('%', :adminSearch, '%'))";
-        if(StringUtils.hasText(cond.getTargetSearch())) countJpql += " and (t.name like concat('%', :targetSearch, '%') or t.email like concat('%', :targetSearch, '%')";
+        if(StringUtils.hasText(cond.getTargetSearch())) countJpql += " and (t.name like concat('%', :targetSearch, '%') or t.email like concat('%', :targetSearch, '%'))";
         if(StringUtils.hasText(cond.getRemarkKeyword())) countJpql += " and h.remark like concat('%', :remarkKeyword, '%')";
 
         TypedQuery<Long> countQuery = em.createQuery(countJpql, Long.class);
