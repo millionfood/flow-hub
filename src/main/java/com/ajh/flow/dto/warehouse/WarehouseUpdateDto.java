@@ -14,20 +14,9 @@ public class WarehouseUpdateDto {
         this.address = address;
     }
 
-    public WarehouseUpdateDto(WarehouseDetailDto dto) {
-        this.name = dto.getName();
-        this.address = dto.getAddress();
-        this.registerName = dto.getRegisterName();
-        this.registerTel = dto.getRegisterTel();
-    }
-
     @NotBlank
     private String name;
     @NotBlank
     private String address;
-    @NotBlank
-    private String registerName;
-    @NotBlank
-    private String registerTel;
 
 }

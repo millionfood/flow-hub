@@ -57,6 +57,9 @@
                 <th>주소</th>
                 <th>관리자 이름</th>
                 <th>관리자 연락처</th>
+                <th>사용 여부</th>
+                <th>관리</th>
+            </tr>
             </tr>
             </thead>
             <tbody>
@@ -64,8 +67,15 @@
                 <td th:text="${w.id}">1</td>
                 <td th:text="${w.name}">서울 제1중앙물류창고</td>
                 <td class="fw-bold text-primary" th:text="${w.address}">SEOUL</td>
-                <td><span class="badge bg-success active" th:text="${w.registerName}">안진혁</span></td>
-                <td><span class="badge bg-secondary active" th:text="${w.registerTel}">01038041915</span></td>
+                <td class="fw-bold text-dark" th:text="${w.registerName}">안진혁</td>
+                <td class="fw-bold text-secondary" th:text="${w.registerTel}">01038041915</td>
+                <td>
+                    <span th:if="${w.useYn.name() == 'Y'}" class="text-success">사용중</span>
+                    <span th:if="${w.useYn.name() == 'N'}" class="text-danger">미사용</span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/warehouse/detail/{id}(id=${w.id})}" class="btn btn-sm btn-outline-secondary">상세정보</a>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(page.content)}">
                 <td colspan="6" class="text-muted py-4">등록된 물류 창고 인프라가 없습니다.</td>

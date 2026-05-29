@@ -3,12 +3,14 @@ package com.ajh.flow.service;
 import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InvalidAddressException;
+import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.User;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
 import com.ajh.flow.dto.warehouse.WarehouseRegisterDto;
 import com.ajh.flow.dto.warehouse.WarehouseSearchCond;
 import com.ajh.flow.dto.warehouse.WarehouseUpdateDto;
+import com.ajh.flow.repository.LocationRepository;
 import com.ajh.flow.repository.UserRepository;
 import com.ajh.flow.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
+    private final LocationRepository locationRepository;
     private final UserRepository userRepository;
 
 
@@ -53,6 +56,13 @@ public class WarehouseService {
     public List<WarehouseDetailDto> findAll() {
         //주의 여기에는 tel 필드가 들어 있지 않음
         return warehouseRepository.findAll()
+                .stream()
+                .map(WarehouseDetailDto::new)
+                .collect(Collectors.toList());
+    }
+    public List<WarehouseDetailDto> findInboundAbleWarehouses() {
+        //주의 여기에는 tel 필드가 들어 있지 않음
+        return warehouseRepository.findInboundAbleWarehouses()
                 .stream()
                 .map(WarehouseDetailDto::new)
                 .collect(Collectors.toList());
@@ -85,8 +95,12 @@ public class WarehouseService {
     public void stopUseWarehouse(Long id){
         //창고 조회 (영속성 컨텍스트에 넣기)
         Warehouse warehouse = findById(id);
-        //해당 엔티티 수정하고 트랜잭션 마무리
+        //warehouse와 location 엔티티 수정
         warehouse.setUseYn(UseYn.N);
+        List<Location> locationList = locationRepository.findLocationsByWarehouse(id);
+        for(Location location : locationList){
+            location.stopUse();
+        }
     }
     //재사용
     @Transactional
@@ -94,7 +108,12 @@ public class WarehouseService {
         //창고 조회 (영속성 컨텍스트에 넣기)
         Warehouse warehouse = findById(id);
         //해당 엔티티 수정하고 트랜잭션 마무리
+        //warehouse와 location 엔티티 수정
         warehouse.setUseYn(UseYn.Y);
+        List<Location> locationList = locationRepository.findLocationsByWarehouse(id);
+        for(Location location : locationList){
+            location.reUse();
+        }
     }
 
 }

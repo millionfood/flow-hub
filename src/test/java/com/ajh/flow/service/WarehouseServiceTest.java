@@ -64,7 +64,6 @@ class WarehouseServiceTest {
         Warehouse warehouse = warehouseService.findById(wareHouseId1);
         assertThat(warehouse.getName()).isEqualTo("서울창고");
         assertThat(warehouse.getAddress()).isEqualTo("서울시");
-        assertThat(warehouse.getRegister()).isEqualTo("안진웅");
 
 
     }

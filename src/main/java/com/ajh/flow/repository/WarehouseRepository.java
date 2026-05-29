@@ -1,5 +1,6 @@
 package com.ajh.flow.repository;
 
+import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
 import com.ajh.flow.dto.warehouse.WarehouseSearchCond;
@@ -47,6 +48,10 @@ public class WarehouseRepository {
     //전체 조회
     public List<Warehouse> findAll() {
         return em.createQuery("select w from Warehouse w", Warehouse.class).getResultList();
+    }
+    public List<Warehouse> findInboundAbleWarehouses(){
+        return em.createQuery("select w from Warehouse w where w.useYn =:useYn",Warehouse.class)
+                .setParameter("useYn", UseYn.Y).getResultList();
     }
     public Page<WarehouseDetailDto> findAllDetailWithPaging(Pageable pageable, WarehouseSearchCond cond) {
         List<WarehouseDetailDto> content = queryFactory
