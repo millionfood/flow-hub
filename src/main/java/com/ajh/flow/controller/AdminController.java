@@ -4,19 +4,21 @@ import com.ajh.flow.common.constant.ItemUnit;
 import com.ajh.flow.common.constant.LocationZone;
 import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.common.constant.UseYn;
+import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.domain.PrincipalDetails;
+import com.ajh.flow.domain.Warehouse;
 import com.ajh.flow.dto.history.HistorySearchCond;
-import com.ajh.flow.dto.item.ItemLocationSearchCond;
-import com.ajh.flow.dto.item.ItemRegisterDto;
-import com.ajh.flow.dto.item.ItemSearchCond;
+import com.ajh.flow.dto.item.*;
 import com.ajh.flow.dto.location.LocationDetailDto;
 import com.ajh.flow.dto.location.LocationLevelCheckDto;
 import com.ajh.flow.dto.location.LocationRegisterDto;
 import com.ajh.flow.dto.location.LocationSearchCond;
 import com.ajh.flow.dto.user.UserSearchCond;
+import com.ajh.flow.dto.warehouse.WarehouseDetailDto;
 import com.ajh.flow.dto.warehouse.WarehouseRegisterDto;
 import com.ajh.flow.dto.warehouse.WarehouseSearchCond;
+import com.ajh.flow.dto.warehouse.WarehouseUpdateDto;
 import com.ajh.flow.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -60,7 +62,7 @@ public class AdminController {
     }
     //-----------------마이페이지-----------------
     @GetMapping("/detail")
-    public String detail(Model model, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public String userDetail(Model model, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         model.addAttribute("user", principalDetails.getUser());
         return "user/detail";
     }
@@ -117,6 +119,32 @@ public class AdminController {
         warehouseService.registerWarehouse(wareHouseRegisterDto);
         return "redirect:/admin/warehouses";
     }
+    @GetMapping("/warehouse/detail/{warehouseId}")
+    public String warehouseDetail(@PathVariable Long warehouseId, Model model) {
+        Warehouse warehouse = warehouseService.findById(warehouseId);
+        WarehouseDetailDto warehouseDetailDto = new WarehouseDetailDto(warehouse);
+        model.addAttribute("warehouseDetail",warehouseDetailDto);
+
+        return "warehouse/detail";
+    }
+    @GetMapping("/warehouse/edit/{id}")
+    public String editForm(@PathVariable Long id, Model model) {
+        Warehouse warehouse = warehouseService.findById(id);
+        model.addAttribute("warehouse", warehouse);
+        model.addAttribute("warehouseId",id);
+        model.addAttribute("useYn", warehouse.getUseYn());
+
+        return "warehouse/edit";
+    }
+    @PostMapping("/warehouse/edit/{id}")
+    public String edit(@PathVariable Long id, @Valid WarehouseUpdateDto warehouseUpdateDto, BindingResult result) {
+        if(result.hasErrors()) {
+            return "warehouse/edit";
+        }
+        warehouseService.updateWarehouse(id, warehouseUpdateDto);
+
+        return  "redirect:/admin/warehouse/detail/"+id;
+    }
     //-----------------로케이션-----------------
     @GetMapping("/locations")
     public String locations(@PageableDefault(size = 10)Pageable pageable, Model model, LocationSearchCond cond){
@@ -131,7 +159,7 @@ public class AdminController {
         model.addAttribute("locationForm", new LocationRegisterDto());
         model.addAttribute("locationZone", LocationZone.values());
         model.addAttribute("useYn", UseYn.values());
-        model.addAttribute("warehouseList", warehouseService.findAll());
+        model.addAttribute("warehouseList", warehouseService.findInboundAbleWarehouses());
 
         return "location/new";
     }
@@ -140,7 +168,7 @@ public class AdminController {
         if(result.hasErrors()){
             model.addAttribute("locationZone", LocationZone.values());
             model.addAttribute("useYn", UseYn.values());
-            model.addAttribute("warehouseList", warehouseService.findAll());
+            model.addAttribute("warehouseList", warehouseService.findInboundAbleWarehouses());
             return "location/new";
         }
         if (dto.getWarehouseId() == null || dto.getSelectedLevels() == null || dto.getSelectedLevels().isEmpty()) {
@@ -175,7 +203,7 @@ public class AdminController {
 
     }
     @GetMapping("/location/detail/{id}")
-    public String detail(Model model, @PathVariable Long id){
+    public String locationDetail(Model model, @PathVariable Long id){
         Location location = locationService.findById(id);
         LocationDetailDto dto = new LocationDetailDto(location);
         model.addAttribute("location", dto);
@@ -235,7 +263,16 @@ public class AdminController {
         itemService.registerItem(form);
         return "redirect:/admin/items";
     }
+    //상품 상세 페이지
     @GetMapping("/item/detail/{id}")
+    public String itemDetail(Model model,@PathVariable Long id) {
+        Item item = itemService.findById(id);
+        ItemDetailDto itemDetailDto = new ItemDetailDto(item);
+        model.addAttribute("itemDetail", itemDetailDto);
+
+        return "items/detail";
+    }
+    @GetMapping("/item/detail_list/{id}")
     public String stocks(@PathVariable("id") Long itemId, @PageableDefault Pageable pageable, ItemLocationSearchCond cond, Model model){
         model.addAttribute("cond", cond);
         model.addAttribute("item",itemService.findById(itemId));
@@ -245,6 +282,27 @@ public class AdminController {
         model.addAttribute("status", StockStatus.values());
         model.addAttribute("page",stockService.findItemWidthPaging(itemId,pageable, cond));
         return "admin/item/itemDetail";
+    }
+    //상품 정보 수정 페이지
+    @GetMapping("/item/edit/{id}")
+    public String itemEditForm(@PathVariable Long id, Model model) {
+        Item item = itemService.findById(id);
+        ItemUpdateDto updateDto = new ItemUpdateDto(item);
+        model.addAttribute("itemForm", updateDto);
+        model.addAttribute("itemId", id);
+        model.addAttribute("itemUnits", ItemUnit.values());
+        return "items/edit";
+    }
+
+    //상품 정보 수정 처리
+    @PostMapping("/item/edit/{id}")
+    public String itemEdit(@PathVariable Long id, @Valid @ModelAttribute("itemForm") ItemUpdateDto form, BindingResult result) {
+        if(result.hasErrors()) {
+            return "items/edit";
+        }
+        itemService.updateItem(id,form);
+
+        return "redirect:/admin/items";
     }
 
     //-----------------히스토리-----------------
