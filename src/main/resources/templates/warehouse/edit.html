@@ -13,7 +13,7 @@
     <h2>창고 정보 수정</h2>
   </div>
 
-  <form th:action th:object="${warehouseForm}" method="post">
+  <form th:action th:object="${warehouse}" method="post">
     <!-- ID는 필수 전송 -->
     <input type="hidden" th:field="${warehouseId}">
 
@@ -31,16 +31,16 @@
       <input type="text" th:field="*{address}" class="form-control">
     </div>
 
-    <!-- 연락처 -->
-    <div class="mb-3">
-      <label th:for="tel">연락처</label>
-      <input type="text" th:field="*{tel}" class="form-control">
-    </div>
-
     <!-- 관리자명 -->
     <div class="mb-3">
-      <label th:for="managerName">관리자명</label>
-      <input type="text" th:field="*{managerName}" class="form-control">
+      <label th:for="managerName">관리자명(수정 불가)</label>
+      <input type="text" th:field="*{register.name}" class="form-control" readonly>
+    </div>
+
+    <!-- 연락처 -->
+    <div class="mb-3">
+      <label th:for="tel">관리자 연락처(수정 불가)</label>
+      <input type="text" th:field="*{register.tel}" class="form-control" readonly>
     </div>
 
     <!-- 현재 상태 (조회 전용) -->
@@ -59,7 +59,7 @@
       </div>
       <div class="col">
         <button class="w-100 btn btn-secondary btn-lg"
-                th:onclick="|location.href='@{/warehouses/detail/{id}(id=${warehouseId})}'|" type="button">취소</button>
+                onclick="history.back(); return false;" type="button">취소</button>
       </div>
     </div>
   </form>

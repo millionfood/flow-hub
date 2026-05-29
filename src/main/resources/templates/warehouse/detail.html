@@ -25,12 +25,12 @@
         <input type="text" th:value="${warehouseDetail.address}" class="form-control" readonly>
     </div>
     <div class="mb-3">
-        <label>연락처</label>
-        <input type="text" th:value="${warehouseDetail.tel}" class="form-control" readonly>
+        <label>관리자</label>
+        <input type="text" th:value="${warehouseDetail.registerName}" class="form-control" readonly>
     </div>
     <div class="mb-3">
-        <label>관리자</label>
-        <input type="text" th:value="${warehouseDetail.managerName}" class="form-control" readonly>
+        <label>연락처</label>
+        <input type="text" th:value="${warehouseDetail.registerTel}" class="form-control" readonly>
     </div>
     <div class="mb-3">
         <label>사용 여부</label>
@@ -41,7 +41,7 @@
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
-                    th:onclick="|location.href='@{/warehouses/edit/{id}(id=${warehouseDetail.id})}'|" type="button">수정</button>
+                    th:onclick="|location.href='@{/admin/warehouse/edit/{id}(id=${warehouseDetail.id})}'|" type="button">수정</button>
         </div>
         <!-- 사용 중일 때만 삭제 버튼 노출 -->
         <div class="col" th:if="${warehouseDetail.useYn.name() == 'Y'}">
@@ -59,8 +59,8 @@
             </form>
         </div>
         <div class="col">
-            <button class="w-100 btn btn-secondary btn-lg"
-                    th:onclick="|location.href='@{/warehouses/list}'|" type="button">목록으로</button>
+            <a class="w-100 btn btn-secondary btn-lg"
+                    th:href="@{/admin/warehouses}">목록으로</a>
         </div>
     </div>
 </div>

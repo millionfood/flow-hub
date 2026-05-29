@@ -9,7 +9,7 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container mt-4">
     <h2>🚚 재고 이동 (Stock Move)</h2>
-    <p class="text-muted">재고의 일부 또는 전체를 다른 로케이션으로 이동합니다.</p>
+    <p class="text-muted">재고의 일부 또는 전체를 같은 창고 내의 다른 로케이션으로 이동합니다.</p>
     <hr>
 
     <form th:action th:object="${stockMoveDto}" method="post">
@@ -18,15 +18,19 @@
             <div class="card-body">
                 <h5 class="card-title text-secondary">출발지 (Source)</h5>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <label class="form-label">현재 창고</label>
+                        <input type="text" th:value="${stockDetailDto.warehouseName}" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-3">
                         <label class="form-label">현재 로케이션</label>
                         <input type="text" th:value="${stockDetailDto.locationLocCode}" class="form-control" readonly>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">상품명</label>
                         <input type="text" th:value="${stockDetailDto.itemName}" class="form-control" readonly>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label">현재 수량</label>
                         <input type="text" id="maxQuantity" th:value="${stockDetailDto.quantity}" class="form-control" readonly>
                     </div>
@@ -40,7 +44,7 @@
         <!-- 2. 이동 설정 -->
         <div class="card mb-4 dest-box shadow-sm">
             <div class="card-body">
-                <h5 class="card-title text-success">이동 설정 (Target)</h5>
+                <h5 class="card-title text-success">창고 내부 로케이션 이동 설정 (Target)</h5>
 
                 <div class="row">
                     <!-- 목적지 선택 -->
