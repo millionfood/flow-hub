@@ -1,6 +1,7 @@
 package com.ajh.flow.service;
 
 import com.ajh.flow.common.constant.LocationZone;
+import com.ajh.flow.common.constant.StockStatus;
 import com.ajh.flow.common.exception.EntityNotFoundException;
 import com.ajh.flow.common.exception.InvalidLocationException;
 import com.ajh.flow.domain.Item;
@@ -45,7 +46,7 @@ public class LocationService {
 
             Location location = dto.toVo(warehouse,lvl);
             //db에 중복되는 locCode가 있는지 확인 - 다른 사용자랑 겹칠 경우를 대비
-            if(locationRepository.existsByLocCode(dto.getWarehouseId(),dto.getZone(),location.getLocCode())) {
+            if(locationRepository.existsByLocCode(dto.getWarehouseId(),zone,location.getLocCode())) {
                 throw new InvalidLocationException("해당 창고의 locCode는 이미 존재합니다. - 다른 사용자가 직전에 등록하였습니다.");
             }
 
@@ -53,6 +54,22 @@ public class LocationService {
             successCnt++;
         }
         return successCnt;
+
+    }
+    @Transactional
+    public Long registerLocationOne(LocationRegisterDto dto){
+        //warehouse 들고오기 - location 엔티티에 넣어줘야함(dto에는 없음)
+        Warehouse warehouse = warehouseService.findById(dto.getWarehouseId());
+
+        Location location = dto.toVo(warehouse,dto.getSelectedLevels().getFirst());
+        //db에 중복되는 locCode가 있는지 확인 - 다른 사용자랑 겹칠 경우를 대비
+        if(locationRepository.existsByLocCode(dto.getWarehouseId(),dto.getZone(),location.getLocCode())) {
+            throw new InvalidLocationException("해당 창고의 locCode는 이미 존재합니다. - 다른 사용자가 직전에 등록하였습니다.");
+        }
+
+        locationRepository.save(location);
+
+        return location.getId();
 
     }
 
@@ -79,12 +96,8 @@ public class LocationService {
         return locationRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
     }
-    public List<LocationDetailDto> findMoveableLocations(Long itemId, Long locationId){
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(EntityNotFoundException::new);
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(EntityNotFoundException::new);
-        return locationRepository.findMoveableLocations(item,location)
+    public List<LocationDetailDto> findMoveableLocations(Long warehouseId,Long itemId, Long locationId, StockStatus status){
+        return locationRepository.findMoveableLocations(warehouseId,itemId,locationId,status)
                 .stream().map(LocationDetailDto::new)
                 .collect(Collectors.toList());
     }

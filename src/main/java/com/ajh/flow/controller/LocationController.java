@@ -45,11 +45,11 @@ public class LocationController {
     @PostMapping("/stopUse/{id}")
     public String stopUse(@PathVariable Long id){
         locationService.stopUseLocation(id);
-        return "redirect:/location/detail/"+id;
+        return "redirect:/admin/location/detail/"+id;
     }
     @PostMapping("/reUse/{id}")
     public String reUse(@PathVariable Long id){
         locationService.reUseLocation(id);
-        return "redirect:/location/detail/"+id;
+        return "redirect:/admin/location/detail/"+id;
     }
 }

@@ -1,6 +1,8 @@
 package com.ajh.flow.repository;
 
 import com.ajh.flow.common.constant.LocationZone;
+import com.ajh.flow.common.constant.StockStatus;
+import com.ajh.flow.common.constant.UseYn;
 import com.ajh.flow.domain.Item;
 import com.ajh.flow.domain.Location;
 import com.ajh.flow.dto.location.LocationSearchCond;
@@ -48,7 +50,7 @@ public class LocationRepository {
                         warehouseIdEq(cond.getWarehouseId()),
                         zoneEq(cond.getZone())
                 )
-                .orderBy(location.locCode.asc())
+                .orderBy(location.warehouse.id.asc(), location.locCode.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -73,10 +75,13 @@ public class LocationRepository {
                 "where l not in ("+
                 "select s.location from Stock s "+
                 "where s.item.id != : itemId) "+
-                "and l.warehouse.id = :warehouseId";
+                "and l.warehouse.id = :warehouseId "+
+                "and l.useYn =:useYn "+
+                "order by l.locCode asc";
         return em.createQuery(jpql,Location.class)
                 .setParameter("itemId",itemId)
                 .setParameter("warehouseId",warehouseId)
+                .setParameter("useYn", UseYn.Y)
                 .getResultList();
     }
     //상품 등록시 창고 기준으로 입고 가능한 로케이션 목록
@@ -104,6 +109,11 @@ public class LocationRepository {
                 .setParameter("col", col)
                 .getResultList();
     }
+    public List<Location> findLocationsByWarehouse(Long warehouseId){
+        return em.createQuery("select l from Location l where l.warehouse.id =: warehouseId",Location.class)
+                .setParameter("warehouseId",warehouseId)
+                .getResultList();
+    }
 
     //단건 조회 - 아이디 기준
     public Optional<Location> findById(Long id) {
@@ -119,15 +129,23 @@ public class LocationRepository {
     }
     //입고 가능한 로케이션(다른 상품이 있으면 안됨)
     //이동 가능한 로케이션(다른 상품이 있거나, 같은 상태의 동일한 상품이 있으면 안됨)
-    public List<Location> findMoveableLocations(Item item,Location location){
-        String jpql = "SELECT l FROM Location l "+
-                "WHERE l != :location "+
-                "AND l NOT IN ( "+
-                "SELECT s.location FROM Stock s "+
-                "WHERE s.item != :item)";
+    public List<Location> findMoveableLocations(Long warehouseId,Long itemId, Long locationId, StockStatus status) {
+        String jpql = "SELECT l FROM Location l " +
+                "WHERE l.id != :locationId " +
+                "AND l.warehouse.id = :warehouseId " +
+                "AND l.useYn = :useYn " +
+                "AND l NOT IN ( " +
+                "    SELECT s.location FROM Stock s " +
+                "    WHERE s.item.id != :itemId " +      // 1. 다른 상품이 있거나
+                "    OR s.status != :status " +         // 2. 같은 상품이어도 상태가 다른 경우
+                ") " +
+                "ORDER BY l.locCode ASC";
         return em.createQuery(jpql,Location.class)
-                .setParameter("item",item)
-                .setParameter("location",location)
+                .setParameter("locationId",locationId)
+                .setParameter("warehouseId",warehouseId)
+                .setParameter("useYn",UseYn.Y)
+                .setParameter("itemId",itemId)
+                .setParameter("status",status)
                 .getResultList();
     }
 
