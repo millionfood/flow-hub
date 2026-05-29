@@ -42,7 +42,7 @@ public class StockRepository {
     //전체 조회
     public List<StockDetailDto> findAll() {
         String jpql = "select new com.ajh.flow.dto.stock.StockDetailDto("+
-                "s.id,w.name,l.id,l.locCode,l.zone,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
+                "s.id,w.name,w.id,l.id,l.locCode,l.zone,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
                 "from Stock s "+
                 "join s.location l "+
                 "join l.warehouse w "+
@@ -55,6 +55,7 @@ public class StockRepository {
                 .select(Projections.constructor(StockDetailDto.class,
                         stock.id,
                         warehouse.name,
+                        warehouse.id,
                         location.id,
                         location.locCode,
                         location.zone,
@@ -168,7 +169,7 @@ public class StockRepository {
     //단건 조회 - dto(수정 화면에서 보여줄 정보)
     public Optional<StockDetailDto> findDetailDtoById(Long id) {
         String jpql = "select new com.ajh.flow.dto.stock.StockDetailDto("+
-                "s.id,w.name,l.id,l.locCode,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
+                "s.id,w.name,w.id,l.id,l.locCode,l.zone,i.id,i.name,s.quantity,s.lastModifiedDate,s.status,s.useYn) "+
                 "from Stock s "+
                 "join s.location l "+
                 "join l.warehouse w "+

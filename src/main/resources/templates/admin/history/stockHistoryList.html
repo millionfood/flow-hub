@@ -129,8 +129,16 @@
                 <td class="text-end pe-4 font-monospace fw-bold">
                     <span class="text-secondary" th:text="${#numbers.formatInteger(h.preQuantity, 1, 'COMMA')}">1,000</span>
                     <span class="text-muted mx-1">→</span>
-                    <span th:text="${h.type == 'IN' || (h.type == 'MOVE' && h.moveQuantity > 0) ? '+' + h.moveQuantity : '-' + h.moveQuantity}"
-                          th:classappend="${h.type == 'IN' ? 'text-success' : 'text-danger'}">+500</span>
+                    <th:block th:switch="${h.type}">
+                        <span th:case="'IN'" class="text-success" th:text="${'+' + h.moveQuantity}">+500</span>
+
+                        <span th:case="'OUT'" class="text-danger" th:text="${h.moveQuantity}">-500</span>
+
+                        <th:block th:case="*">
+                            <span th:if="${h.moveQuantity > 0}" class="text-success" th:text="${'+' + h.moveQuantity}">+500</span>
+                            <span th:if="${h.moveQuantity <= 0}" class="text-danger" th:text="${h.moveQuantity}">-500</span>
+                        </th:block>
+                    </th:block>
                     <span class="text-muted mx-1">→</span>
                     <span class="text-primary" th:text="|${#numbers.formatInteger(h.postQuantity, 1, 'COMMA')} EA|">1,500 EA</span>
                 </td>

@@ -15,16 +15,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StockHistory extends BaseEntity {
 
-    public static StockHistory createStockHistory(Stock stock, User user, Long moveQuantity,
+    public static StockHistory createStockHistory(Stock stock, User user,Long preQuantity ,Long moveQuantity,
                                                   StockTransactionType type, String remark) {
-        Long preQuantity = stock.getQuantity();
-        Long postQuantity;
 
-        if(type == StockTransactionType.IN || (type == StockTransactionType.MOVE && moveQuantity > 0)){
-            postQuantity = preQuantity + moveQuantity;
-        }else{
-            postQuantity = preQuantity - moveQuantity;
-        }
+        Long postQuantity = preQuantity + moveQuantity;
 
         return StockHistory.builder()
                 .item(stock.getItem())

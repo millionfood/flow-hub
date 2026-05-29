@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class StockServiceTest {
     @Autowired private StockService stockService;
     @Autowired private WarehouseService warehouseService;
@@ -64,15 +66,15 @@ class StockServiceTest {
     @BeforeEach
     void setUp() {
         levels1.add("01");
-        levels2.add("01");
+        levels2.add("02");
         //유저 등록
         userId = userService.registerUser(new UserRegisterDto("millionfood@naver.com","12312312312","안진혁", UserRole.USER,"01038041915"));
         user = userRepository.findById(userId).get();
         //창고 생성
         warehouseId = warehouseService.registerWarehouse(new WarehouseRegisterDto("통영창고", "통영시 구닥로", userId));
         //로케이션 생성
-        locationId = locationService.registerLocation(new LocationRegisterDto(warehouseId, LocationZone.COLD,"01","01",levels1));
-        locationId2 = locationService.registerLocation(new LocationRegisterDto(warehouseId, LocationZone.COLD,"01","01",levels2));
+        locationId = locationService.registerLocationOne(new LocationRegisterDto(warehouseId, LocationZone.COLD,"01","01",levels1));
+        locationId2 = locationService.registerLocationOne(new LocationRegisterDto(warehouseId, LocationZone.COLD,"01","01",levels2));
         //상품 생성
         itemId = itemService.registerItem(new ItemRegisterDto("사과",1000L,ItemUnit.EA,"두쫀쿠사과"));
         itemId2 = itemService.registerItem(new ItemRegisterDto("배",1500L,ItemUnit.EA,"두바이배"));

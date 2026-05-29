@@ -39,16 +39,14 @@ public class StockController {
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("stock", new StockRegisterDto());
-        model.addAttribute("warehouses",warehouseService.findAll());
+        model.addAttribute("warehouses",warehouseService.findInboundAbleWarehouses());
         model.addAttribute("items", itemService.findAll());
-        model.addAttribute("locations", locationService.findAll());
         model.addAttribute("stockStatus", StockStatus.values());
         return "stocks/new";
     }
     //입고 실행 처리
     @PostMapping("/new")
     public String create(@ModelAttribute("inboundForm") StockRegisterDto form, @AuthenticationPrincipal PrincipalDetails principalDetails, BindingResult bindingResult) {
-
         stockService.registerStockWithSecurity(form, principalDetails.getUser());
         return "redirect:/stocks/list";
     }
@@ -90,7 +88,7 @@ public class StockController {
         model.addAttribute("stockId",id);
         model.addAttribute("stockMoveDto", new StockMoveDto(dto));
         model.addAttribute("stockDetailDto",dto);
-        model.addAttribute("moveableLocations",locationService.findMoveableLocations(dto.getItemId(),dto.getLocationId()));
+        model.addAttribute("moveableLocations",locationService.findMoveableLocations(dto.getWarehouseId(),dto.getItemId(),dto.getLocationId(),dto.getStatus()));
         return "stocks/move";
     }
     @PostMapping("/move/{id}")
@@ -102,7 +100,7 @@ public class StockController {
             model.addAttribute("stockId",id);
             model.addAttribute("stockMoveDto", dto);
             model.addAttribute("stockDetailDto",detailDto);
-            model.addAttribute("moveableLocations",locationService.findMoveableLocations(detailDto.getItemId(),detailDto.getLocationId()));
+            model.addAttribute("moveableLocations",locationService.findMoveableLocations(detailDto.getWarehouseId(),detailDto.getItemId(),detailDto.getLocationId(),detailDto.getStatus()));
             return "stocks/move";
         }
         stockService.moveStock(id,dto,principalDetails.getUser());

@@ -14,6 +14,7 @@ public class StockDetailDto {
 
     private Long id;
     private String warehouseName;
+    private Long warehouseId;
     private Long locationId;
     private String locationLocCode;
     private LocationZone zone;
