@@ -35,45 +35,15 @@ public class ItemController {
         model.addAttribute("page", itemService.findAllDetailDto(pageable, cond));
         return "items/list";
     }
-    //상품 상세 페이지
-    @GetMapping("/detail/{id}")
-    public String detail(Model model,@PathVariable Long id) {
-        Item item = itemService.findById(id);
-        ItemDetailDto itemDetailDto = new ItemDetailDto(item);
-        model.addAttribute("itemDetail", itemDetailDto);
-
-        return "items/detail";
-    }
-
 
     //-----------------수정-----------------
-    //상품 정보 수정 페이지
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model) {
-        Item item = itemService.findById(id);
-        ItemUpdateDto updateDto = new ItemUpdateDto(item);
-        model.addAttribute("itemForm", updateDto);
-        model.addAttribute("itemId", id);
-        model.addAttribute("itemUnits", ItemUnit.values());
-        return "items/edit";
-    }
 
-    //상품 정보 수정 처리
-    @PostMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, @Valid @ModelAttribute("itemForm") ItemUpdateDto form, BindingResult result) {
-        if(result.hasErrors()) {
-            return "items/edit";
-        }
-        itemService.updateItem(id,form);
-
-        return "redirect:/items/list";
-    }
 
 
     //-----------------삭제-----------------
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         itemService.deleteItem(id);
-        return  "redirect:/items/list";
+        return  "redirect:/admin/items";
     }
 }

@@ -50,6 +50,7 @@
                 <th>SKU 식별 바코드</th>
                 <th class="text-center" style="width: 50%;">대표 상품명</th>
                 <th class="text-center pe-4">보유 수량 (EA)</th>
+                <th class="text-center">정보</th>
                 <th class="text-center">관리</th>
             </tr>
             </thead>
@@ -62,7 +63,10 @@
                     th:text="|${#numbers.formatInteger(i.totalQuantity, 1, 'COMMA')} EA|"
                     th:classappend="${i.totalQuantity < 10 ? 'text-danger' : 'text-dark'}">1,250 EA</td>
                 <td>
-                    <a th:href="@{/admin/item/detail/{id}(id=${i.id})}" class="btn btn-sm btn-outline-secondary">상세정보</a>
+                    <a th:href="@{/admin/item/detail/{id}(id=${i.id})}" class="btn btn-sm btn-outline-secondary">상세 정보</a>
+                </td>
+                <td>
+                    <a th:href="@{/admin/item/detail_list/{id}(id=${i.id})}" class="btn btn-sm btn-outline-secondary">재고 정보</a>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(page.getContent())}">

@@ -19,7 +19,7 @@ public class ItemEntityTest {
         item.createFullBarcode(productCode);
 
         //Then
-        assertThat(item.getBarcode()).isEqualTo("8801111000420");
+        assertThat(item.getBarcode()).isEqualTo("8801111000437");
 
     }
 }

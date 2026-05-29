@@ -55,12 +55,12 @@ class ItemServiceTest {
         itemService.registerItem(form1);
         em.flush();
         em.clear();
-        assertThat(itemRepository.findLastProductCode()).isEqualTo("00001");
+        assertThat(itemRepository.findLastProductCode()).isEqualTo("00021");
 
         itemService.registerItem(form2);
         em.flush();
         em.clear();
-        assertThat(itemRepository.findLastProductCode()).isEqualTo("00002");
+        assertThat(itemRepository.findLastProductCode()).isEqualTo("00022");
         //Then
 
     }
@@ -70,7 +70,7 @@ class ItemServiceTest {
     @Test
     @DisplayName("잘못된 아이디, 바코드 입력시 EntityNotFoundException이 발생해야 한다.")
     public void findEmptyItem(){
-        assertThrows(EntityNotFoundException.class, () -> itemService.findById(10L));
+        assertThrows(EntityNotFoundException.class, () -> itemService.findById(100L));
         assertThrows(EntityNotFoundException.class, () -> itemService.findByBarcode("0000"));
     }
 
